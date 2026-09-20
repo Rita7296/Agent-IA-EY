@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Market Radar Agent — Démo interactive</title>
+<title>MarketLens — Démo interactive</title>
 <style>
   :root {
     --yellow: #FFE600;
@@ -77,9 +77,23 @@
   .bubble th, .bubble td { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border); }
   .bubble th { color: var(--text-2); font-size: 0.7rem; text-transform: uppercase; }
   .bubble .tag { display: inline-block; font-size: 0.7rem; padding: 2px 8px; border-radius: 20px; font-weight: 700; margin-left: 4px; }
-  .tag-invest { background: var(--yellow); color: var(--black); }
-  .tag-renforcer, .tag-optimiser { background: #e4e4de; color: var(--text); }
-  .tag-sortir { background: var(--black); color: #fff; }
+  .score-mini { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+  .score-chip { background: #f0f0eb; border-radius: 8px; padding: 3px 8px; font-size: 0.72rem; color: var(--text-2); }
+  .score-chip strong { color: var(--text); }
+  .brief-line { margin: 6px 0; line-height: 1.5; }
+  .brief-line .ico { margin-right: 4px; }
+  .exec-list { margin: 2px 0 10px 0; padding-left: 20px; }
+  .exec-list li { margin: 3px 0; line-height: 1.45; font-size: 0.9rem; }
+  .prio-row { display: flex; justify-content: space-between; gap: 10px; padding: 5px 0; border-bottom: 1px dashed var(--border); font-size: 0.85rem; }
+  .prio-row:last-child { border-bottom: none; }
+  .prio-name { font-weight: 600; }
+  .prio-detail { color: var(--text-2); font-size: 0.78rem; }
+  /* Couleurs reprises telles quelles de la mesure DAX "Couleur Jauge Attractivité" */
+  .tag-prioriser { background: #2E7D32; color: #fff; }
+  .tag-poursuivre { background: #4A8B43; color: #fff; }
+  .tag-maintenir { background: var(--yellow); color: var(--black); }
+  .tag-selective { background: #E89A52; color: var(--black); }
+  .tag-reevaluer { background: #C65A5A; color: #fff; }
 
   .ext-brief {
     background: #fbfbf9;
@@ -89,9 +103,15 @@
     padding: 14px 16px;
     font-size: 0.85rem;
   }
-  .ext-head { font-weight: 700; margin-bottom: 8px; }
+  .ext-head { font-weight: 700; margin-bottom: 10px; font-size: 0.92rem; }
   .ext-date { font-weight: 400; font-size: 0.72rem; color: var(--text-2); }
-  .ext-row { margin-bottom: 6px; }
+  .ext-section { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed var(--border); }
+  .ext-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .ext-section-title { font-weight: 700; font-size: 0.8rem; margin-bottom: 5px; color: #355C7D; }
+  .ext-num { display: inline-block; background: #355C7D; color: #fff; border-radius: 50%; width: 16px; height: 16px; line-height: 16px; text-align: center; font-size: 0.65rem; margin-right: 2px; }
+  .ext-list { margin: 0; padding-left: 20px; }
+  .ext-list li { margin: 3px 0; line-height: 1.45; font-size: 0.85rem; }
+  .ext-note { margin-top: 6px; font-size: 0.82rem; line-height: 1.45; color: var(--text-2); }
   .orient-badge {
     display: inline-block;
     margin-top: 6px;
@@ -162,8 +182,8 @@
 
   <div class="hero">
     <div class="hero-bar"></div>
-    <h1>Agent IA de veille décisionnelle</h1>
-    <p>Démo interactive — Cas Maison Shop-EY · Yasmine Baalouch</p>
+    <h1>MarketLens — Agent de veille décisionnelle</h1>
+    <p>Démo interactive — Shop-EY</p>
   </div>
 
   <div class="panel">
@@ -178,600 +198,16 @@
       <div class="chip" data-q="Quels marchés dois-je prioriser ?">Quels marchés prioriser ?</div>
       <div class="chip" data-q="Compare l'Inde et le Royaume-Uni">Compare l'Inde et le Royaume-Uni</div>
       <div class="chip" data-q="Quelles entreprises grandissent vite sans trop de risque ?">Croissance forte, risque maîtrisé</div>
-      <div class="chip" data-q="Contexte externe pour l'Inde">🌐 Contexte externe : Inde</div>
-      <div class="chip" data-q="Contexte externe pour le Royaume-Uni">🌐 Contexte externe : Royaume-Uni</div>
+      <div class="chip" data-q="Contexte externe pour l'Inde">Contexte externe : Inde</div>
+      <div class="chip" data-q="Contexte externe pour le Royaume-Uni">Contexte externe : Royaume-Uni</div>
     </div>
 
-    <div class="note">
-      Deux couches dans cet agent. <strong>Signal interne</strong> : calculé à partir du scorecard (données fournies
-      par EY), 100% local, sans appel réseau. <strong>Investigation externe</strong> (🌐) : recherche web réelle
-      effectuée le 20/09/2026, figée pour cette démo afin de ne pas dépendre d'une connexion internet le jour de
-      l'entretien — sources et dates citées. En production, cette couche interrogerait des sources en continu
-      (réglementation, actualités, concurrence) et vivrait sur Copilot Studio, connecté au modèle Power BI.
-    </div>
   </div>
 
-  <footer>Cas Maison EY — Données &amp; IA Canada, Septembre 2026.</footer>
+  <footer>EY — Données &amp; IA Canada, Septembre 2026.</footer>
 </div>
 
-<script id="agent-data" type="application/json">{
- "briefs": {
-  "AR": "l'Argentine se positionne dans la catégorie « Optimiser » (score marché 44.2/100, score performance 58.9/100). Évolution macro observée : pénétration internet 45% (2010) → 90% (2024); bancarisation 33% → 82%; IDE net 2.7% → 1.8% du PIB. Sur 1 acteurs publics suivis dans ce marché, la croissance moyenne du revenu est de 38.9%/an et la marge nette moyenne de 6.9%. 1 entreprise(s) combinent forte croissance (>20%) et volatilité maîtrisée (<50%). Recommandation : La performance des acteurs dépasse ce que suggèrent les seuls indicateurs macro absolus (revenu par habitant, etc.) : marché probablement sous-évalué par une lecture macro classique — consolider la position et optimiser l'exécution locale plutôt que de se fier uniquement au score d'attractivité brut.",
-  "BR": "le Brésil se positionne dans la catégorie « Optimiser » (score marché 33.7/100, score performance 50.7/100). Évolution macro observée : pénétration internet 41% (2010) → 84% (2024); bancarisation 56% → 86%; PIB total 2209Md$ → 2186Md$; IDE net 3.7% → 3.4% du PIB. Sur 1 acteurs publics suivis dans ce marché, la croissance moyenne du revenu est de 14.1%/an et la marge nette moyenne de 17.3%. 0 entreprise(s) combinent forte croissance (>20%) et volatilité maîtrisée (<50%). Recommandation : La performance des acteurs dépasse ce que suggèrent les seuls indicateurs macro absolus (revenu par habitant, etc.) : marché probablement sous-évalué par une lecture macro classique — consolider la position et optimiser l'exécution locale plutôt que de se fier uniquement au score d'attractivité brut. Projection (FMI, World Economic Outlook, octobre 2025) : croissance du PIB attendue à 1.9% en 2026, contre -0.1%/an en moyenne sur la période observée → accélération attendue.",
-  "CA": "le Canada se positionne dans la catégorie « Optimiser » (score marché 44.1/100, score performance 50.5/100). Évolution macro observée : pénétration internet 80% (2010) → 94% (2024); bancarisation 96% → 98%; PIB total 1617Md$ → 2244Md$; IDE net 1.8% → 2.8% du PIB. Sur 1 acteurs publics suivis dans ce marché, la croissance moyenne du revenu est de 27.3%/an et la marge nette moyenne de 10.7%. 0 entreprise(s) combinent forte croissance (>20%) et volatilité maîtrisée (<50%). Recommandation : La performance des acteurs dépasse ce que suggèrent les seuls indicateurs macro absolus (revenu par habitant, etc.) : marché probablement sous-évalué par une lecture macro classique — consolider la position et optimiser l'exécution locale plutôt que de se fier uniquement au score d'attractivité brut. Projection (FMI, World Economic Outlook, octobre 2025) : croissance du PIB attendue à 1.5% en 2026, contre 2.4%/an en moyenne sur la période observée → ralentissement attendu.",
-  "CN": "la Chine se positionne dans la catégorie « Investir » (score marché 53.7/100, score performance 53.8/100). Évolution macro observée : pénétration internet 34% (2010) → 92% (2025); bancarisation 64% → 89%; PIB total 6193Md$ → 18744Md$; IDE net 3.9% → 0.1% du PIB. Sur 4 acteurs publics suivis dans ce marché, la croissance moyenne du revenu est de 15.7%/an et la marge nette moyenne de 11.0%. 0 entreprise(s) combinent forte croissance (>20%) et volatilité maîtrisée (<50%). Recommandation : Prioriser un renforcement de l'investissement : marché en accélération avec des acteurs rentables. Projection (FMI, World Economic Outlook, octobre 2025) : croissance du PIB attendue à 4.4% en 2026, contre 8.2%/an en moyenne sur la période observée → ralentissement attendu.",
-  "DE": "l'Allemagne se positionne dans la catégorie « Renforcer sélectivement » (score marché 48.8/100, score performance 41.0/100). Évolution macro observée : pénétration internet 82% (2010) → 93% (2024); bancarisation 98% → 98%; PIB total 3467Md$ → 4686Md$; IDE net 2.5% → 1.0% du PIB. Sur 1 acteurs publics suivis dans ce marché, la croissance moyenne du revenu est de 6.1%/an et la marge nette moyenne de 1.7%. 0 entreprise(s) combinent forte croissance (>20%) et volatilité maîtrisée (<50%). Recommandation : Marché structurellement attractif (taille, équipement digital) mais dont les acteurs suivis sous-performent actuellement : investir de façon ciblée / accompagner un redressement plutôt qu'augmenter l'exposition globale. Projection (FMI, World Economic Outlook, octobre 2025) : croissance du PIB attendue à 0.8% en 2026, contre 2.2%/an en moyenne sur la période observée → ralentissement attendu.",
-  "GB": "le Royaume-Uni se positionne dans la catégorie « Renforcer sélectivement » (score marché 47.6/100, score performance 28.9/100). Évolution macro observée : pénétration internet 85% (2010) → 95% (2024); bancarisation 97% → 99%; PIB total 2497Md$ → 3686Md$; IDE net 2.7% → -0.4% du PIB. Sur 5 acteurs publics suivis dans ce marché, la croissance moyenne du revenu est de -10.6%/an et la marge nette moyenne de 4.8%. 0 entreprise(s) combinent forte croissance (>20%) et volatilité maîtrisée (<50%). Recommandation : Marché structurellement attractif (taille, équipement digital) mais dont les acteurs suivis sous-performent actuellement : investir de façon ciblée / accompagner un redressement plutôt qu'augmenter l'exposition globale. Projection (FMI, World Economic Outlook, octobre 2025) : croissance du PIB attendue à 1.3% en 2026, contre 2.8%/an en moyenne sur la période observée → ralentissement attendu.",
-  "ID": "l'Indonésie se positionne dans la catégorie « Sortir / réduire » (score marché 15.3/100, score performance 17.5/100). Évolution macro observée : pénétration internet 11% (2010) → 73% (2024); bancarisation 20% → 56%; PIB total 755Md$ → 1396Md$; IDE net 2.0% → 1.7% du PIB. Sur 1 acteurs publics suivis dans ce marché, la croissance moyenne du revenu est de 17.3%/an et la marge nette moyenne de -6.5%. 0 entreprise(s) combinent forte croissance (>20%) et volatilité maîtrisée (<50%). Recommandation : Signal de risque cumulé (faible attractivité structurelle et acteurs sous pression) : réévaluer la présence, envisager une réduction d'exposition. Projection (FMI, World Economic Outlook, octobre 2025) : croissance du PIB attendue à 5.0% en 2026, contre 4.5%/an en moyenne sur la période observée → accélération attendue.",
-  "IN": "l'Inde se positionne dans la catégorie « Optimiser » (score marché 24.0/100, score performance 72.6/100). Évolution macro observée : pénétration internet 8% (2010) → 70% (2025); bancarisation 35% → 89%; PIB total 1676Md$ → 3910Md$; IDE net 1.6% → 0.7% du PIB. Sur 12 acteurs publics suivis dans ce marché, la croissance moyenne du revenu est de 30.8%/an et la marge nette moyenne de 11.5%. 6 entreprise(s) combinent forte croissance (>20%) et volatilité maîtrisée (<50%). Recommandation : La performance des acteurs dépasse ce que suggèrent les seuls indicateurs macro absolus (revenu par habitant, etc.) : marché probablement sous-évalué par une lecture macro classique — consolider la position et optimiser l'exécution locale plutôt que de se fier uniquement au score d'attractivité brut. Projection (FMI, World Economic Outlook, octobre 2025) : croissance du PIB attendue à 6.5% en 2026, contre 6.2%/an en moyenne sur la période observée → trajectoire stable.",
-  "JP": "le Japon se positionne dans la catégorie « Renforcer sélectivement » (score marché 49.9/100, score performance 45.8/100). Évolution macro observée : pénétration internet 78% (2010) → 86% (2024); bancarisation 96% → 99%; PIB total 5759Md$ → 4028Md$; IDE net 0.1% → 0.4% du PIB. Sur 1 acteurs publics suivis dans ce marché, la croissance moyenne du revenu est de 9.1%/an et la marge nette moyenne de -7.1%. 0 entreprise(s) combinent forte croissance (>20%) et volatilité maîtrisée (<50%). Recommandation : Marché structurellement attractif (taille, équipement digital) mais dont les acteurs suivis sous-performent actuellement : investir de façon ciblée / accompagner un redressement plutôt qu'augmenter l'exposition globale. Projection (FMI, World Economic Outlook, octobre 2025) : croissance du PIB attendue à 0.7% en 2026, contre -2.5%/an en moyenne sur la période observée → accélération attendue.",
-  "KR": "la Corée du Sud se positionne dans la catégorie « Renforcer sélectivement » (score marché 51.2/100, score performance 32.3/100). Évolution macro observée : pénétration internet 84% (2010) → 98% (2024); bancarisation 93% → 97%; PIB total 1193Md$ → 1875Md$; IDE net 0.8% → 0.7% du PIB. Sur 1 acteurs publics suivis dans ce marché, la croissance moyenne du revenu est de 18.8%/an et la marge nette moyenne de 0.6%. 0 entreprise(s) combinent forte croissance (>20%) et volatilité maîtrisée (<50%). Recommandation : Marché structurellement attractif (taille, équipement digital) mais dont les acteurs suivis sous-performent actuellement : investir de façon ciblée / accompagner un redressement plutôt qu'augmenter l'exposition globale. Projection (FMI, World Economic Outlook, octobre 2025) : croissance du PIB attendue à 1.8% en 2026, contre 3.3%/an en moyenne sur la période observée → ralentissement attendu.",
-  "PL": "la Pologne se positionne dans la catégorie « Optimiser » (score marché 34.1/100, score performance 57.3/100). Évolution macro observée : pénétration internet 62% (2010) → 89% (2024); bancarisation 70% → 86%; PIB total 478Md$ → 918Md$; IDE net 3.9% → 2.2% du PIB. Sur 1 acteurs publics suivis dans ce marché, la croissance moyenne du revenu est de 8.4%/an et la marge nette moyenne de 13.2%. 0 entreprise(s) combinent forte croissance (>20%) et volatilité maîtrisée (<50%). Recommandation : La performance des acteurs dépasse ce que suggèrent les seuls indicateurs macro absolus (revenu par habitant, etc.) : marché probablement sous-évalué par une lecture macro classique — consolider la position et optimiser l'exécution locale plutôt que de se fier uniquement au score d'attractivité brut. Projection (FMI, World Economic Outlook, octobre 2025) : croissance du PIB attendue à 3.1% en 2026, contre 4.8%/an en moyenne sur la période observée → ralentissement attendu.",
-  "SG": "Singapour se positionne dans la catégorie « Renforcer sélectivement » (score marché 72.1/100, score performance 28.5/100). Évolution macro observée : pénétration internet 71% (2010) → 94% (2024); bancarisation 98% → 98%; PIB total 240Md$ → 547Md$; IDE net 23.1% → 24.7% du PIB. Sur 1 acteurs publics suivis dans ce marché, la croissance moyenne du revenu est de 22.6%/an et la marge nette moyenne de 6.9%. 0 entreprise(s) combinent forte croissance (>20%) et volatilité maîtrisée (<50%). Recommandation : Marché structurellement attractif (taille, équipement digital) mais dont les acteurs suivis sous-performent actuellement : investir de façon ciblée / accompagner un redressement plutôt qu'augmenter l'exposition globale. Projection (FMI, World Economic Outlook, octobre 2025) : croissance du PIB attendue à 1.8% en 2026, contre 6.1%/an en moyenne sur la période observée → ralentissement attendu.",
-  "US": "les États-Unis se positionne dans la catégorie « Investir » (score marché 63.5/100, score performance 48.2/100). Évolution macro observée : pénétration internet 72% (2010) → 95% (2024); bancarisation 88% → 97%; PIB total 15049Md$ → 28751Md$; IDE net 1.8% → 1.0% du PIB. Sur 13 acteurs publics suivis dans ce marché, la croissance moyenne du revenu est de 9.6%/an et la marge nette moyenne de 6.6%. 0 entreprise(s) combinent forte croissance (>20%) et volatilité maîtrisée (<50%). Recommandation : Prioriser un renforcement de l'investissement : marché en accélération avec des acteurs rentables. Projection (FMI, World Economic Outlook, octobre 2025) : croissance du PIB attendue à 2.1% en 2026, contre 4.7%/an en moyenne sur la période observée → ralentissement attendu."
- },
- "quadrant_groups": {
-  "Investir": [
-   {
-    "code": "US",
-    "name_fr": "les États-Unis"
-   },
-   {
-    "code": "CN",
-    "name_fr": "la Chine"
-   }
-  ],
-  "Optimiser": [
-   {
-    "code": "AR",
-    "name_fr": "l'Argentine"
-   },
-   {
-    "code": "IN",
-    "name_fr": "l'Inde"
-   },
-   {
-    "code": "CA",
-    "name_fr": "le Canada"
-   },
-   {
-    "code": "PL",
-    "name_fr": "la Pologne"
-   },
-   {
-    "code": "BR",
-    "name_fr": "le Brésil"
-   }
-  ],
-  "Renforcer sélectivement": [
-   {
-    "code": "SG",
-    "name_fr": "Singapour"
-   },
-   {
-    "code": "JP",
-    "name_fr": "le Japon"
-   },
-   {
-    "code": "DE",
-    "name_fr": "l'Allemagne"
-   },
-   {
-    "code": "KR",
-    "name_fr": "la Corée du Sud"
-   },
-   {
-    "code": "GB",
-    "name_fr": "le Royaume-Uni"
-   }
-  ],
-  "Sortir / réduire": [
-   {
-    "code": "ID",
-    "name_fr": "l'Indonésie"
-   }
-  ]
- },
- "scorecard": [
-  {
-   "code": "US",
-   "name_fr": "les États-Unis",
-   "attractiveness_score": 63.5,
-   "performance_score": 48.2,
-   "quadrant": "Investir",
-   "n_companies": 13
-  },
-  {
-   "code": "CN",
-   "name_fr": "la Chine",
-   "attractiveness_score": 53.7,
-   "performance_score": 53.8,
-   "quadrant": "Investir",
-   "n_companies": 4
-  },
-  {
-   "code": "AR",
-   "name_fr": "l'Argentine",
-   "attractiveness_score": 44.2,
-   "performance_score": 58.9,
-   "quadrant": "Optimiser",
-   "n_companies": 1
-  },
-  {
-   "code": "SG",
-   "name_fr": "Singapour",
-   "attractiveness_score": 72.1,
-   "performance_score": 28.5,
-   "quadrant": "Renforcer sélectivement",
-   "n_companies": 1
-  },
-  {
-   "code": "IN",
-   "name_fr": "l'Inde",
-   "attractiveness_score": 24.0,
-   "performance_score": 72.6,
-   "quadrant": "Optimiser",
-   "n_companies": 12
-  },
-  {
-   "code": "JP",
-   "name_fr": "le Japon",
-   "attractiveness_score": 49.9,
-   "performance_score": 45.8,
-   "quadrant": "Renforcer sélectivement",
-   "n_companies": 1
-  },
-  {
-   "code": "CA",
-   "name_fr": "le Canada",
-   "attractiveness_score": 44.1,
-   "performance_score": 50.5,
-   "quadrant": "Optimiser",
-   "n_companies": 1
-  },
-  {
-   "code": "PL",
-   "name_fr": "la Pologne",
-   "attractiveness_score": 34.1,
-   "performance_score": 57.3,
-   "quadrant": "Optimiser",
-   "n_companies": 1
-  },
-  {
-   "code": "DE",
-   "name_fr": "l'Allemagne",
-   "attractiveness_score": 48.8,
-   "performance_score": 41.0,
-   "quadrant": "Renforcer sélectivement",
-   "n_companies": 1
-  },
-  {
-   "code": "BR",
-   "name_fr": "le Brésil",
-   "attractiveness_score": 33.7,
-   "performance_score": 50.7,
-   "quadrant": "Optimiser",
-   "n_companies": 1
-  },
-  {
-   "code": "KR",
-   "name_fr": "la Corée du Sud",
-   "attractiveness_score": 51.2,
-   "performance_score": 32.3,
-   "quadrant": "Renforcer sélectivement",
-   "n_companies": 1
-  },
-  {
-   "code": "GB",
-   "name_fr": "le Royaume-Uni",
-   "attractiveness_score": 47.6,
-   "performance_score": 28.9,
-   "quadrant": "Renforcer sélectivement",
-   "n_companies": 5
-  },
-  {
-   "code": "ID",
-   "name_fr": "l'Indonésie",
-   "attractiveness_score": 15.3,
-   "performance_score": 17.5,
-   "quadrant": "Sortir / réduire",
-   "n_companies": 1
-  }
- ],
- "companies": [
-  {
-   "name": "Affirm Holdings",
-   "code": "US",
-   "name_fr": "les États-Unis",
-   "revenue_cagr": 33.7,
-   "annualized_volatility": 94.1,
-   "net_margin": 1.6
-  },
-  {
-   "name": "Alibaba Group",
-   "code": "CN",
-   "name_fr": "la Chine",
-   "revenue_cagr": 5.3,
-   "annualized_volatility": 41.9,
-   "net_margin": 13.1
-  },
-  {
-   "name": "Allegro.eu",
-   "code": "PL",
-   "name_fr": "la Pologne",
-   "revenue_cagr": 8.4,
-   "annualized_volatility": 42.4,
-   "net_margin": 13.2
-  },
-  {
-   "name": "Amazon.com",
-   "code": "US",
-   "name_fr": "les États-Unis",
-   "revenue_cagr": 11.7,
-   "annualized_volatility": 32.7,
-   "net_margin": 10.8
-  },
-  {
-   "name": "AO World",
-   "code": "GB",
-   "name_fr": "le Royaume-Uni",
-   "revenue_cagr": -6.0,
-   "annualized_volatility": 50.8,
-   "net_margin": 0.9
-  },
-  {
-   "name": "ASOS",
-   "code": "GB",
-   "name_fr": "le Royaume-Uni",
-   "revenue_cagr": -14.3,
-   "annualized_volatility": 56.8,
-   "net_margin": -12.0
-  },
-  {
-   "name": "Auto Trader Group",
-   "code": "GB",
-   "name_fr": "le Royaume-Uni",
-   "revenue_cagr": 11.6,
-   "annualized_volatility": 28.3,
-   "net_margin": 47.0
-  },
-  {
-   "name": "Block, Inc.",
-   "code": "US",
-   "name_fr": "les États-Unis",
-   "revenue_cagr": 11.3,
-   "annualized_volatility": 57.5,
-   "net_margin": 5.4
-  },
-  {
-   "name": "Debenhams Group (formerly Boohoo)",
-   "code": "GB",
-   "name_fr": "le Royaume-Uni",
-   "revenue_cagr": -26.4,
-   "annualized_volatility": 58.1,
-   "net_margin": -41.3
-  },
-  {
-   "name": "CarTrade Tech",
-   "code": "IN",
-   "name_fr": "l'Inde",
-   "revenue_cagr": 29.0,
-   "annualized_volatility": 48.5,
-   "net_margin": 28.6
-  },
-  {
-   "name": "Carvana",
-   "code": "US",
-   "name_fr": "les États-Unis",
-   "revenue_cagr": 14.3,
-   "annualized_volatility": 97.5,
-   "net_margin": 6.9
-  },
-  {
-   "name": "Chewy",
-   "code": "US",
-   "name_fr": "les États-Unis",
-   "revenue_cagr": 7.6,
-   "annualized_volatility": 60.7,
-   "net_margin": 1.8
-  },
-  {
-   "name": "Coupang",
-   "code": "KR",
-   "name_fr": "la Corée du Sud",
-   "revenue_cagr": 18.8,
-   "annualized_volatility": 52.5,
-   "net_margin": 0.6
-  },
-  {
-   "name": "Delhivery",
-   "code": "IN",
-   "name_fr": "l'Inde",
-   "revenue_cagr": 9.1,
-   "annualized_volatility": 38.3,
-   "net_margin": 1.8
-  },
-  {
-   "name": "DoorDash",
-   "code": "US",
-   "name_fr": "les États-Unis",
-   "revenue_cagr": 27.7,
-   "annualized_volatility": 57.2,
-   "net_margin": 6.8
-  },
-  {
-   "name": "Easy Trip Planners",
-   "code": "IN",
-   "name_fr": "l'Inde",
-   "revenue_cagr": 35.6,
-   "annualized_volatility": 51.5,
-   "net_margin": 18.3
-  },
-  {
-   "name": "eBay",
-   "code": "US",
-   "name_fr": "les États-Unis",
-   "revenue_cagr": 4.3,
-   "annualized_volatility": 30.9,
-   "net_margin": 18.3
-  },
-  {
-   "name": "Etsy",
-   "code": "US",
-   "name_fr": "les États-Unis",
-   "revenue_cagr": 4.0,
-   "annualized_volatility": 58.2,
-   "net_margin": 5.7
-  },
-  {
-   "name": "Brainbees (FirstCry)",
-   "code": "IN",
-   "name_fr": "l'Inde",
-   "revenue_cagr": 27.6,
-   "annualized_volatility": 50.8,
-   "net_margin": -2.6
-  },
-  {
-   "name": "GoTo Group",
-   "code": "ID",
-   "name_fr": "l'Indonésie",
-   "revenue_cagr": 17.3,
-   "annualized_volatility": 61.4,
-   "net_margin": -6.5
-  },
-  {
-   "name": "Honasa Consumer (Mamaearth)",
-   "code": "IN",
-   "name_fr": "l'Inde",
-   "revenue_cagr": 29.9,
-   "annualized_volatility": 46.9,
-   "net_margin": 3.5
-  },
-  {
-   "name": "IndiaMART InterMESH",
-   "code": "IN",
-   "name_fr": "l'Inde",
-   "revenue_cagr": 16.8,
-   "annualized_volatility": 67.9,
-   "net_margin": 30.3
-  },
-  {
-   "name": "Info Edge (Naukri)",
-   "code": "IN",
-   "name_fr": "l'Inde",
-   "revenue_cagr": 21.5,
-   "annualized_volatility": 36.7,
-   "net_margin": 33.8
-  },
-  {
-   "name": "Maplebear (Instacart)",
-   "code": "US",
-   "name_fr": "les États-Unis",
-   "revenue_cagr": 13.6,
-   "annualized_volatility": 46.0,
-   "net_margin": 11.9
-  },
-  {
-   "name": "Le Travenues (ixigo)",
-   "code": "IN",
-   "name_fr": "l'Inde",
-   "revenue_cagr": 34.0,
-   "annualized_volatility": 52.0,
-   "net_margin": 6.6
-  },
-  {
-   "name": "JD.com",
-   "code": "CN",
-   "name_fr": "la Chine",
-   "revenue_cagr": 7.8,
-   "annualized_volatility": 46.9,
-   "net_margin": 1.5
-  },
-  {
-   "name": "MercadoLibre",
-   "code": "AR",
-   "name_fr": "l'Argentine",
-   "revenue_cagr": 38.9,
-   "annualized_volatility": 47.1,
-   "net_margin": 6.9
-  },
-  {
-   "name": "Nykaa (FSN E-Commerce)",
-   "code": "IN",
-   "name_fr": "l'Inde",
-   "revenue_cagr": 28.1,
-   "annualized_volatility": 38.0,
-   "net_margin": 0.8
-  },
-  {
-   "name": "Ocado Group",
-   "code": "GB",
-   "name_fr": "le Royaume-Uni",
-   "revenue_cagr": -18.1,
-   "annualized_volatility": 55.4,
-   "net_margin": 29.3
-  },
-  {
-   "name": "PayPal Holdings",
-   "code": "US",
-   "name_fr": "les États-Unis",
-   "revenue_cagr": 6.4,
-   "annualized_volatility": 38.8,
-   "net_margin": 15.8
-  },
-  {
-   "name": "One 97 Communications (Paytm)",
-   "code": "IN",
-   "name_fr": "l'Inde",
-   "revenue_cagr": 2.2,
-   "annualized_volatility": 52.7,
-   "net_margin": 6.6
-  },
-  {
-   "name": "PDD Holdings (Pinduoduo)",
-   "code": "CN",
-   "name_fr": "la Chine",
-   "revenue_cagr": 49.0,
-   "annualized_volatility": 68.5,
-   "net_margin": 22.7
-  },
-  {
-   "name": "PB Fintech (Policybazaar)",
-   "code": "IN",
-   "name_fr": "l'Inde",
-   "revenue_cagr": 38.5,
-   "annualized_volatility": 45.9,
-   "net_margin": 9.9
-  },
-  {
-   "name": "Rakuten Group",
-   "code": "JP",
-   "name_fr": "le Japon",
-   "revenue_cagr": 9.1,
-   "annualized_volatility": 37.0,
-   "net_margin": -7.1
-  },
-  {
-   "name": "Revolve Group",
-   "code": "US",
-   "name_fr": "les États-Unis",
-   "revenue_cagr": 3.6,
-   "annualized_volatility": 66.8,
-   "net_margin": 5.0
-  },
-  {
-   "name": "Sea Limited (Shopee)",
-   "code": "SG",
-   "name_fr": "Singapour",
-   "revenue_cagr": 22.6,
-   "annualized_volatility": 62.3,
-   "net_margin": 6.9
-  },
-  {
-   "name": "Shopify",
-   "code": "CA",
-   "name_fr": "le Canada",
-   "revenue_cagr": 27.3,
-   "annualized_volatility": 60.3,
-   "net_margin": 10.7
-  },
-  {
-   "name": "Stitch Fix",
-   "code": "US",
-   "name_fr": "les États-Unis",
-   "revenue_cagr": -14.4,
-   "annualized_volatility": 84.0,
-   "net_margin": -2.3
-  },
-  {
-   "name": "StoneCo",
-   "code": "BR",
-   "name_fr": "le Brésil",
-   "revenue_cagr": 14.1,
-   "annualized_volatility": 67.7,
-   "net_margin": 17.3
-  },
-  {
-   "name": "Vipshop",
-   "code": "CN",
-   "name_fr": "la Chine",
-   "revenue_cagr": 0.9,
-   "annualized_volatility": 55.9,
-   "net_margin": 6.8
-  },
-  {
-   "name": "Wayfair",
-   "code": "US",
-   "name_fr": "les États-Unis",
-   "revenue_cagr": 0.6,
-   "annualized_volatility": 73.2,
-   "net_margin": -2.5
-  },
-  {
-   "name": "Zalando",
-   "code": "DE",
-   "name_fr": "l'Allemagne",
-   "revenue_cagr": 6.1,
-   "annualized_volatility": 42.4,
-   "net_margin": 1.7
-  },
-  {
-   "name": "Eternal (Zomato)",
-   "code": "IN",
-   "name_fr": "l'Inde",
-   "revenue_cagr": 97.7,
-   "annualized_volatility": 48.3,
-   "net_margin": 0.7
-  }
- ],
- "aliases": {
-  "US": [
-   "etats-unis",
-   "etats unis",
-   "usa"
-  ],
-  "CN": [
-   "chine"
-  ],
-  "AR": [
-   "argentine"
-  ],
-  "SG": [
-   "singapour"
-  ],
-  "IN": [
-   "inde"
-  ],
-  "JP": [
-   "japon"
-  ],
-  "CA": [
-   "canada"
-  ],
-  "PL": [
-   "pologne"
-  ],
-  "DE": [
-   "allemagne"
-  ],
-  "BR": [
-   "bresil"
-  ],
-  "KR": [
-   "coree du sud",
-   "coree"
-  ],
-  "GB": [
-   "royaume-uni",
-   "royaume uni",
-   "uk",
-   "angleterre"
-  ],
-  "ID": [
-   "indonesie"
-  ]
- }
-}</script>
+<script id="agent-data" type="application/json">{"briefs": {"AR": {"code": "AR", "name_fr": "l'Argentine", "score_attractivite": 42.2, "orientation": "Investir de façon sélective", "reco_text": "score en retrait sur au moins une dimension clé : cibler des investissements ponctuels plutôt qu'un renforcement généralisé.", "subscores": {"taille": 25.0, "pouvoir_achat": 33.3, "croissance_pib": null, "maturite_digitale": 41.7, "dynamique_investissement": 100.0}, "population": 45696159.0, "gdp_per_capita_usd": 13970.0, "n_companies": 1, "avg_growth_pct": 38.9, "avg_margin_pct": 11.1, "n_above_growth_benchmark": 1, "top_company": {"name": "MercadoLibre", "growth_pct": 38.9}, "weak_company": null, "projection": null}, "BR": {"code": "BR", "name_fr": "le Brésil", "score_attractivite": 40.0, "orientation": "Investir de façon sélective", "reco_text": "score en retrait sur au moins une dimension clé : cibler des investissements ponctuels plutôt qu'un renforcement généralisé.", "subscores": {"taille": 66.7, "pouvoir_achat": 16.7, "croissance_pib": null, "maturite_digitale": 16.7, "dynamique_investissement": 91.7}, "population": 211998573.0, "gdp_per_capita_usd": 10311.0, "n_companies": 1, "avg_growth_pct": 14.1, "avg_margin_pct": 52.0, "n_above_growth_benchmark": 1, "top_company": {"name": "StoneCo", "growth_pct": 14.1}, "weak_company": null, "projection": {"hist_pct": -0.1, "proj_2026_pct": 1.9, "label": "accélération attendue", "source": "FMI, World Economic Outlook, octobre 2025"}}, "CA": {"code": "CA", "name_fr": "le Canada", "score_attractivite": 55.0, "orientation": "Maintenir et optimiser", "reco_text": "profil équilibré, sans signal fort dans un sens ou l'autre : maintenir la présence et optimiser l'exécution plutôt qu'augmenter l'exposition.", "subscores": {"taille": 16.7, "pouvoir_achat": 75.0, "croissance_pib": null, "maturite_digitale": 66.7, "dynamique_investissement": 58.3}, "population": 41288599.0, "gdp_per_capita_usd": 54340.0, "n_companies": 1, "avg_growth_pct": 27.3, "avg_margin_pct": 16.3, "n_above_growth_benchmark": 1, "top_company": {"name": "Shopify", "growth_pct": 27.3}, "weak_company": null, "projection": {"hist_pct": 2.4, "proj_2026_pct": 1.5, "label": "ralentissement attendu", "source": "FMI, World Economic Outlook, octobre 2025"}}, "CN": {"code": "CN", "name_fr": "la Chine", "score_attractivite": 49.4, "orientation": "Investir de façon sélective", "reco_text": "score en retrait sur au moins une dimension clé : cibler des investissements ponctuels plutôt qu'un renforcement généralisé.", "subscores": {"taille": 91.7, "pouvoir_achat": 25.0, "croissance_pib": null, "maturite_digitale": 50.0, "dynamique_investissement": 25.0}, "population": 1408975000.0, "gdp_per_capita_usd": 13303.0, "n_companies": 4, "avg_growth_pct": 15.8, "avg_margin_pct": 11.1, "n_above_growth_benchmark": 1, "top_company": {"name": "PDD Holdings (Pinduoduo)", "growth_pct": 49.0}, "weak_company": {"name": "Vipshop", "growth_pct": 0.9}, "projection": {"hist_pct": 8.2, "proj_2026_pct": 4.4, "label": "ralentissement attendu", "source": "FMI, World Economic Outlook, octobre 2025"}}, "DE": {"code": "DE", "name_fr": "l'Allemagne", "score_attractivite": 58.9, "orientation": "Maintenir et optimiser", "reco_text": "profil équilibré, sans signal fort dans un sens ou l'autre : maintenir la présence et optimiser l'exécution plutôt qu'augmenter l'exposition.", "subscores": {"taille": 50.0, "pouvoir_achat": 83.3, "croissance_pib": null, "maturite_digitale": 58.3, "dynamique_investissement": 16.7}, "population": 83516593.0, "gdp_per_capita_usd": 56104.0, "n_companies": 1, "avg_growth_pct": 6.1, "avg_margin_pct": 3.1, "n_above_growth_benchmark": 0, "top_company": {"name": "Zalando", "growth_pct": 6.1}, "weak_company": null, "projection": {"hist_pct": 2.2, "proj_2026_pct": 0.8, "label": "ralentissement attendu", "source": "FMI, World Economic Outlook, octobre 2025"}}, "GB": {"code": "GB", "name_fr": "le Royaume-Uni", "score_attractivite": 57.8, "orientation": "Maintenir et optimiser", "reco_text": "profil équilibré, sans signal fort dans un sens ou l'autre : maintenir la présence et optimiser l'exécution plutôt qu'augmenter l'exposition.", "subscores": {"taille": 41.7, "pouvoir_achat": 66.7, "croissance_pib": null, "maturite_digitale": 91.7, "dynamique_investissement": 0.0}, "population": 69226000.0, "gdp_per_capita_usd": 53246.0, "n_companies": 5, "avg_growth_pct": -10.6, "avg_margin_pct": 3.7, "n_above_growth_benchmark": 0, "top_company": {"name": "Auto Trader Group", "growth_pct": 11.6}, "weak_company": {"name": "Debenhams Group (formerly Boohoo)", "growth_pct": -26.4}, "projection": {"hist_pct": 2.8, "proj_2026_pct": 1.3, "label": "ralentissement attendu", "source": "FMI, World Economic Outlook, octobre 2025"}}, "ID": {"code": "ID", "name_fr": "l'Indonésie", "score_attractivite": 31.7, "orientation": "Réévaluer avant d'investir", "reco_text": "score faible sur plusieurs dimensions : réévaluer la stratégie avant tout renforcement d'investissement.", "subscores": {"taille": 75.0, "pouvoir_achat": 8.3, "croissance_pib": null, "maturite_digitale": 8.3, "dynamique_investissement": 50.0}, "population": 283487931.0, "gdp_per_capita_usd": 4925.0, "n_companies": 1, "avg_growth_pct": 17.3, "avg_margin_pct": -2.1, "n_above_growth_benchmark": 1, "top_company": {"name": "GoTo Group", "growth_pct": 17.3}, "weak_company": null, "projection": {"hist_pct": 4.5, "proj_2026_pct": 5.0, "label": "accélération attendue", "source": "FMI, World Economic Outlook, octobre 2025"}}, "IN": {"code": "IN", "name_fr": "l'Inde", "score_attractivite": 31.1, "orientation": "Réévaluer avant d'investir", "reco_text": "score faible sur plusieurs dimensions : réévaluer la stratégie avant tout renforcement d'investissement.", "subscores": {"taille": 100.0, "pouvoir_achat": 0.0, "croissance_pib": null, "maturite_digitale": 0.0, "dynamique_investissement": 33.3}, "population": 1450935791.0, "gdp_per_capita_usd": 2695.0, "n_companies": 12, "avg_growth_pct": 30.8, "avg_margin_pct": 10.5, "n_above_growth_benchmark": 10, "top_company": {"name": "Eternal (Zomato)", "growth_pct": 97.7}, "weak_company": {"name": "One 97 Communications (Paytm)", "growth_pct": 2.2}, "projection": {"hist_pct": 6.2, "proj_2026_pct": 6.5, "label": "trajectoire stable", "source": "FMI, World Economic Outlook, octobre 2025"}}, "JP": {"code": "JP", "name_fr": "le Japon", "score_attractivite": 44.4, "orientation": "Investir de façon sélective", "reco_text": "score en retrait sur au moins une dimension clé : cibler des investissements ponctuels plutôt qu'un renforcement généralisé.", "subscores": {"taille": 58.3, "pouvoir_achat": 50.0, "croissance_pib": null, "maturite_digitale": 25.0, "dynamique_investissement": 41.7}, "population": 123975371.0, "gdp_per_capita_usd": 32487.0, "n_companies": 1, "avg_growth_pct": 9.1, "avg_margin_pct": 0.6, "n_above_growth_benchmark": 0, "top_company": {"name": "Rakuten Group", "growth_pct": 9.1}, "weak_company": null, "projection": {"hist_pct": -2.5, "proj_2026_pct": 0.7, "label": "accélération attendue", "source": "FMI, World Economic Outlook, octobre 2025"}}, "KR": {"code": "KR", "name_fr": "la Corée du Sud", "score_attractivite": 66.1, "orientation": "Poursuivre les investissements", "reco_text": "fondamentaux solides sur la majorité des dimensions du score : poursuivre la trajectoire d'investissement actuelle.", "subscores": {"taille": 33.3, "pouvoir_achat": 58.3, "croissance_pib": null, "maturite_digitale": 100.0, "dynamique_investissement": 83.3}, "population": 51751065.0, "gdp_per_capita_usd": 36239.0, "n_companies": 1, "avg_growth_pct": 18.8, "avg_margin_pct": 1.4, "n_above_growth_benchmark": 1, "top_company": {"name": "Coupang", "growth_pct": 18.8}, "weak_company": null, "projection": {"hist_pct": 3.3, "proj_2026_pct": 1.8, "label": "ralentissement attendu", "source": "FMI, World Economic Outlook, octobre 2025"}}, "PL": {"code": "PL", "name_fr": "la Pologne", "score_attractivite": 35.0, "orientation": "Investir de façon sélective", "reco_text": "score en retrait sur au moins une dimension clé : cibler des investissements ponctuels plutôt qu'un renforcement généralisé.", "subscores": {"taille": 8.3, "pouvoir_achat": 41.7, "croissance_pib": null, "maturite_digitale": 33.3, "dynamique_investissement": 75.0}, "population": 36559233.0, "gdp_per_capita_usd": 25104.0, "n_companies": 1, "avg_growth_pct": 8.4, "avg_margin_pct": 18.9, "n_above_growth_benchmark": 0, "top_company": {"name": "Allegro.eu", "growth_pct": 8.4}, "weak_company": null, "projection": {"hist_pct": 4.8, "proj_2026_pct": 3.1, "label": "ralentissement attendu", "source": "FMI, World Economic Outlook, octobre 2025"}}, "SG": {"code": "SG", "name_fr": "Singapour", "score_attractivite": 54.4, "orientation": "Maintenir et optimiser", "reco_text": "profil équilibré, sans signal fort dans un sens ou l'autre : maintenir la présence et optimiser l'exécution plutôt qu'augmenter l'exposition.", "subscores": {"taille": 0.0, "pouvoir_achat": 100.0, "croissance_pib": null, "maturite_digitale": 75.0, "dynamique_investissement": 8.3}, "population": 6036860.0, "gdp_per_capita_usd": 90674.0, "n_companies": 1, "avg_growth_pct": 22.6, "avg_margin_pct": 8.7, "n_above_growth_benchmark": 1, "top_company": {"name": "Sea Limited (Shopee)", "growth_pct": 22.6}, "weak_company": null, "projection": {"hist_pct": 6.1, "proj_2026_pct": 1.8, "label": "ralentissement attendu", "source": "FMI, World Economic Outlook, octobre 2025"}}, "US": {"code": "US", "name_fr": "les États-Unis", "score_attractivite": 83.9, "orientation": "Prioriser l'investissement", "reco_text": "taille, pouvoir d'achat, croissance et maturité numérique sont tous favorables — accélérer l'investissement.", "subscores": {"taille": 83.3, "pouvoir_achat": 91.7, "croissance_pib": null, "maturite_digitale": 83.3, "dynamique_investissement": 66.7}, "population": 340110988.0, "gdp_per_capita_usd": 84534.0, "n_companies": 13, "avg_growth_pct": 9.6, "avg_margin_pct": 9.3, "n_above_growth_benchmark": 4, "top_company": {"name": "Affirm Holdings", "growth_pct": 33.7}, "weak_company": {"name": "Stitch Fix", "growth_pct": -14.4}, "projection": {"hist_pct": 4.7, "proj_2026_pct": 2.1, "label": "ralentissement attendu", "source": "FMI, World Economic Outlook, octobre 2025"}}}, "orientation_order": ["Prioriser l'investissement", "Poursuivre les investissements", "Maintenir et optimiser", "Investir de façon sélective", "Réévaluer avant d'investir"], "orientation_groups": {"Prioriser l'investissement": [{"code": "US", "name_fr": "les États-Unis", "score": 83.9, "avg_growth_pct": 9.6, "n_companies": 13}], "Poursuivre les investissements": [{"code": "KR", "name_fr": "la Corée du Sud", "score": 66.1, "avg_growth_pct": 18.8, "n_companies": 1}], "Maintenir et optimiser": [{"code": "DE", "name_fr": "l'Allemagne", "score": 58.9, "avg_growth_pct": 6.1, "n_companies": 1}, {"code": "GB", "name_fr": "le Royaume-Uni", "score": 57.8, "avg_growth_pct": -10.6, "n_companies": 5}, {"code": "CA", "name_fr": "le Canada", "score": 55.0, "avg_growth_pct": 27.3, "n_companies": 1}, {"code": "SG", "name_fr": "Singapour", "score": 54.4, "avg_growth_pct": 22.6, "n_companies": 1}], "Investir de façon sélective": [{"code": "CN", "name_fr": "la Chine", "score": 49.4, "avg_growth_pct": 15.8, "n_companies": 4}, {"code": "JP", "name_fr": "le Japon", "score": 44.4, "avg_growth_pct": 9.1, "n_companies": 1}, {"code": "AR", "name_fr": "l'Argentine", "score": 42.2, "avg_growth_pct": 38.9, "n_companies": 1}, {"code": "BR", "name_fr": "le Brésil", "score": 40.0, "avg_growth_pct": 14.1, "n_companies": 1}, {"code": "PL", "name_fr": "la Pologne", "score": 35.0, "avg_growth_pct": 8.4, "n_companies": 1}], "Réévaluer avant d'investir": [{"code": "ID", "name_fr": "l'Indonésie", "score": 31.7, "avg_growth_pct": 17.3, "n_companies": 1}, {"code": "IN", "name_fr": "l'Inde", "score": 31.1, "avg_growth_pct": 30.8, "n_companies": 12}]}, "scorecard": [{"code": "AR", "name_fr": "l'Argentine", "score_attractivite": 42.2, "orientation": "Investir de façon sélective", "score_taille": 25.0, "score_pouvoir": 33.3, "score_croissance": null, "score_digital": 41.7, "score_invest": 100.0, "population": 45696159.0, "gdp_per_capita_usd": 13970.0}, {"code": "BR", "name_fr": "le Brésil", "score_attractivite": 40.0, "orientation": "Investir de façon sélective", "score_taille": 66.7, "score_pouvoir": 16.7, "score_croissance": null, "score_digital": 16.7, "score_invest": 91.7, "population": 211998573.0, "gdp_per_capita_usd": 10311.0}, {"code": "CA", "name_fr": "le Canada", "score_attractivite": 55.0, "orientation": "Maintenir et optimiser", "score_taille": 16.7, "score_pouvoir": 75.0, "score_croissance": null, "score_digital": 66.7, "score_invest": 58.3, "population": 41288599.0, "gdp_per_capita_usd": 54340.0}, {"code": "CN", "name_fr": "la Chine", "score_attractivite": 49.4, "orientation": "Investir de façon sélective", "score_taille": 91.7, "score_pouvoir": 25.0, "score_croissance": null, "score_digital": 50.0, "score_invest": 25.0, "population": 1408975000.0, "gdp_per_capita_usd": 13303.0}, {"code": "DE", "name_fr": "l'Allemagne", "score_attractivite": 58.9, "orientation": "Maintenir et optimiser", "score_taille": 50.0, "score_pouvoir": 83.3, "score_croissance": null, "score_digital": 58.3, "score_invest": 16.7, "population": 83516593.0, "gdp_per_capita_usd": 56104.0}, {"code": "GB", "name_fr": "le Royaume-Uni", "score_attractivite": 57.8, "orientation": "Maintenir et optimiser", "score_taille": 41.7, "score_pouvoir": 66.7, "score_croissance": null, "score_digital": 91.7, "score_invest": 0.0, "population": 69226000.0, "gdp_per_capita_usd": 53246.0}, {"code": "ID", "name_fr": "l'Indonésie", "score_attractivite": 31.7, "orientation": "Réévaluer avant d'investir", "score_taille": 75.0, "score_pouvoir": 8.3, "score_croissance": null, "score_digital": 8.3, "score_invest": 50.0, "population": 283487931.0, "gdp_per_capita_usd": 4925.0}, {"code": "IN", "name_fr": "l'Inde", "score_attractivite": 31.1, "orientation": "Réévaluer avant d'investir", "score_taille": 100.0, "score_pouvoir": 0.0, "score_croissance": null, "score_digital": 0.0, "score_invest": 33.3, "population": 1450935791.0, "gdp_per_capita_usd": 2695.0}, {"code": "JP", "name_fr": "le Japon", "score_attractivite": 44.4, "orientation": "Investir de façon sélective", "score_taille": 58.3, "score_pouvoir": 50.0, "score_croissance": null, "score_digital": 25.0, "score_invest": 41.7, "population": 123975371.0, "gdp_per_capita_usd": 32487.0}, {"code": "KR", "name_fr": "la Corée du Sud", "score_attractivite": 66.1, "orientation": "Poursuivre les investissements", "score_taille": 33.3, "score_pouvoir": 58.3, "score_croissance": null, "score_digital": 100.0, "score_invest": 83.3, "population": 51751065.0, "gdp_per_capita_usd": 36239.0}, {"code": "PL", "name_fr": "la Pologne", "score_attractivite": 35.0, "orientation": "Investir de façon sélective", "score_taille": 8.3, "score_pouvoir": 41.7, "score_croissance": null, "score_digital": 33.3, "score_invest": 75.0, "population": 36559233.0, "gdp_per_capita_usd": 25104.0}, {"code": "SG", "name_fr": "Singapour", "score_attractivite": 54.4, "orientation": "Maintenir et optimiser", "score_taille": 0.0, "score_pouvoir": 100.0, "score_croissance": null, "score_digital": 75.0, "score_invest": 8.3, "population": 6036860.0, "gdp_per_capita_usd": 90674.0}, {"code": "US", "name_fr": "les États-Unis", "score_attractivite": 83.9, "orientation": "Prioriser l'investissement", "score_taille": 83.3, "score_pouvoir": 91.7, "score_croissance": null, "score_digital": 83.3, "score_invest": 66.7, "population": 340110988.0, "gdp_per_capita_usd": 84534.0}], "companies": [{"company_id": "affirm", "name": "Affirm Holdings", "country_code": "US", "name_fr": "les États-Unis", "revenue_cagr": 33.7, "ecart_croissance_pp": 22.0, "operating_margin": 10.5, "ecart_marge_pp": 2.9, "annualized_volatility": 94.1, "lecture_risque": "Risque élevé : volatilité 42.1 pp au-dessus de la médiane de référence (43 entreprises).", "fcf_margin": 18.7, "lecture_cash": "Bonne capacité de trésorerie : 18.7% des revenus, 13.6 pp au-dessus de la médiane de référence.", "max_drawdown": -94.7, "lecture_baisse": "Baisse historique sévère : -94.7%, 12.2 pp de plus que la médiane de référence."}, {"company_id": "alibaba", "name": "Alibaba Group", "country_code": "CN", "name_fr": "la Chine", "revenue_cagr": 5.3, "ecart_croissance_pp": -6.4, "operating_margin": 14.8, "ecart_marge_pp": 7.2, "annualized_volatility": 41.9, "lecture_risque": "Risque contenu : volatilité 10.1 pp sous la médiane de référence.", "fcf_margin": 7.8, "lecture_cash": "Génération de trésorerie proche de la médiane de référence (7.8%).", "max_drawdown": -80.1, "lecture_baisse": "Résistance proche de la médiane de référence (-80.1%)."}, {"company_id": "allegro", "name": "Allegro.eu", "country_code": "PL", "name_fr": "la Pologne", "revenue_cagr": 8.4, "ecart_croissance_pp": -3.4, "operating_margin": 18.9, "ecart_marge_pp": 11.3, "annualized_volatility": 42.4, "lecture_risque": "Risque contenu : volatilité 9.6 pp sous la médiane de référence.", "fcf_margin": 16.2, "lecture_cash": "Bonne capacité de trésorerie : 16.2% des revenus, 11.1 pp au-dessus de la médiane de référence.", "max_drawdown": -80.6, "lecture_baisse": "Résistance proche de la médiane de référence (-80.6%)."}, {"company_id": "amazon", "name": "Amazon.com", "country_code": "US", "name_fr": "les États-Unis", "revenue_cagr": 11.7, "ecart_croissance_pp": 0.0, "operating_margin": 11.2, "ecart_marge_pp": 3.6, "annualized_volatility": 32.7, "lecture_risque": "Risque contenu : volatilité 19.3 pp sous la médiane de référence.", "fcf_margin": 1.1, "lecture_cash": "Génération de trésorerie proche de la médiane de référence (1.1%).", "max_drawdown": -56.1, "lecture_baisse": "Bonne résistance : -56.1%, 26.3 pp de mieux que la médiane de référence."}, {"company_id": "ao", "name": "AO World", "country_code": "GB", "name_fr": "le Royaume-Uni", "revenue_cagr": -6.0, "ecart_croissance_pp": -17.7, "operating_margin": 3.9, "ecart_marge_pp": -3.7, "annualized_volatility": 50.8, "lecture_risque": "Risque contenu : volatilité 1.2 pp sous la médiane de référence.", "fcf_margin": 4.3, "lecture_cash": "Génération de trésorerie proche de la médiane de référence (4.3%).", "max_drawdown": -91.3, "lecture_baisse": "Baisse historique modérée : -91.3%, légèrement plus forte que la médiane de référence."}, {"company_id": "asos", "name": "ASOS", "country_code": "GB", "name_fr": "le Royaume-Uni", "revenue_cagr": -14.3, "ecart_croissance_pp": -26.0, "operating_margin": -1.4, "ecart_marge_pp": -8.9, "annualized_volatility": 56.8, "lecture_risque": "Risque modéré : volatilité légèrement supérieure à la médiane de référence.", "fcf_margin": 3.0, "lecture_cash": "Génération de trésorerie proche de la médiane de référence (3.0%).", "max_drawdown": -97.3, "lecture_baisse": "Baisse historique sévère : -97.3%, 14.8 pp de plus que la médiane de référence."}, {"company_id": "autotrader", "name": "Auto Trader Group", "country_code": "GB", "name_fr": "le Royaume-Uni", "revenue_cagr": 11.6, "ecart_croissance_pp": -0.2, "operating_margin": 62.1, "ecart_marge_pp": 54.6, "annualized_volatility": 28.3, "lecture_risque": "Risque contenu : volatilité 23.7 pp sous la médiane de référence.", "fcf_margin": 50.0, "lecture_cash": "Bonne capacité de trésorerie : 50.0% des revenus, 44.9 pp au-dessus de la médiane de référence.", "max_drawdown": -50.8, "lecture_baisse": "Bonne résistance : -50.8%, 31.7 pp de mieux que la médiane de référence."}, {"company_id": "block", "name": "Block, Inc.", "country_code": "US", "name_fr": "les États-Unis", "revenue_cagr": 11.3, "ecart_croissance_pp": -0.4, "operating_margin": 12.6, "ecart_marge_pp": 5.1, "annualized_volatility": 57.5, "lecture_risque": "Risque modéré : volatilité légèrement supérieure à la médiane de référence.", "fcf_margin": 10.0, "lecture_cash": "Génération de trésorerie proche de la médiane de référence (10.0%).", "max_drawdown": -86.1, "lecture_baisse": "Baisse historique modérée : -86.1%, légèrement plus forte que la médiane de référence."}, {"company_id": "boohoo", "name": "Debenhams Group (formerly Boohoo)", "country_code": "GB", "name_fr": "le Royaume-Uni", "revenue_cagr": -26.4, "ecart_croissance_pp": -38.1, "operating_margin": -30.7, "ecart_marge_pp": -38.2, "annualized_volatility": 58.1, "lecture_risque": "Risque modéré : volatilité légèrement supérieure à la médiane de référence.", "fcf_margin": -4.3, "lecture_cash": "Génération de trésorerie négative (-4.3% des revenus).", "max_drawdown": -97.5, "lecture_baisse": "Baisse historique sévère : -97.5%, 15.0 pp de plus que la médiane de référence."}, {"company_id": "cartrade", "name": "CarTrade Tech", "country_code": "IN", "name_fr": "l'Inde", "revenue_cagr": 29.0, "ecart_croissance_pp": 17.2, "operating_margin": 28.0, "ecart_marge_pp": 20.5, "annualized_volatility": 48.5, "lecture_risque": "Risque contenu : volatilité 3.5 pp sous la médiane de référence.", "fcf_margin": 29.6, "lecture_cash": "Bonne capacité de trésorerie : 29.6% des revenus, 24.5 pp au-dessus de la médiane de référence.", "max_drawdown": -78.0, "lecture_baisse": "Résistance proche de la médiane de référence (-78.0%)."}, {"company_id": "carvana", "name": "Carvana", "country_code": "US", "name_fr": "les États-Unis", "revenue_cagr": 14.3, "ecart_croissance_pp": 2.6, "operating_margin": 9.3, "ecart_marge_pp": 1.7, "annualized_volatility": 97.5, "lecture_risque": "Risque élevé : volatilité 45.5 pp au-dessus de la médiane de référence (43 entreprises).", "fcf_margin": 4.4, "lecture_cash": "Génération de trésorerie proche de la médiane de référence (4.4%).", "max_drawdown": -99.0, "lecture_baisse": "Baisse historique sévère : -99.0%, 16.5 pp de plus que la médiane de référence."}, {"company_id": "chewy", "name": "Chewy", "country_code": "US", "name_fr": "les États-Unis", "revenue_cagr": 7.6, "ecart_croissance_pp": -4.1, "operating_margin": 2.0, "ecart_marge_pp": -5.5, "annualized_volatility": 60.7, "lecture_risque": "Risque modéré : volatilité légèrement supérieure à la médiane de référence.", "fcf_margin": 4.5, "lecture_cash": "Génération de trésorerie proche de la médiane de référence (4.5%).", "max_drawdown": -87.4, "lecture_baisse": "Baisse historique modérée : -87.4%, légèrement plus forte que la médiane de référence."}, {"company_id": "coupang", "name": "Coupang", "country_code": "KR", "name_fr": "la Corée du Sud", "revenue_cagr": 18.8, "ecart_croissance_pp": 7.1, "operating_margin": 1.4, "ecart_marge_pp": -6.2, "annualized_volatility": 52.5, "lecture_risque": "Risque modéré : volatilité légèrement supérieure à la médiane de référence.", "fcf_margin": 1.5, "lecture_cash": "Génération de trésorerie proche de la médiane de référence (1.5%).", "max_drawdown": -81.5, "lecture_baisse": "Résistance proche de la médiane de référence (-81.5%)."}, {"company_id": "delhivery", "name": "Delhivery", "country_code": "IN", "name_fr": "l'Inde", "revenue_cagr": 9.1, "ecart_croissance_pp": -2.7, "operating_margin": -1.7, "ecart_marge_pp": -9.3, "annualized_volatility": 38.3, "lecture_risque": "Risque contenu : volatilité 13.7 pp sous la médiane de référence.", "fcf_margin": 0.9, "lecture_cash": "Génération de trésorerie proche de la médiane de référence (0.9%).", "max_drawdown": -65.6, "lecture_baisse": "Bonne résistance : -65.6%, 16.9 pp de mieux que la médiane de référence."}, {"company_id": "doordash", "name": "DoorDash", "country_code": "US", "name_fr": "les États-Unis", "revenue_cagr": 27.7, "ecart_croissance_pp": 16.0, "operating_margin": 5.3, "ecart_marge_pp": -2.2, "annualized_volatility": 57.2, "lecture_risque": "Risque modéré : volatilité légèrement supérieure à la médiane de référence.", "fcf_margin": 13.3, "lecture_cash": "Bonne capacité de trésorerie : 13.3% des revenus, 8.2 pp au-dessus de la médiane de référence.", "max_drawdown": -82.5, "lecture_baisse": "Résistance proche de la médiane de référence (-82.5%)."}, {"company_id": "easetrip", "name": "Easy Trip Planners", "country_code": "IN", "name_fr": "l'Inde", "revenue_cagr": 35.6, "ecart_croissance_pp": 23.9, "operating_margin": 22.8, "ecart_marge_pp": 15.3, "annualized_volatility": 51.5, "lecture_risque": "Risque contenu : volatilité 0.5 pp sous la médiane de référence.", "fcf_margin": 7.8, "lecture_cash": "Génération de trésorerie proche de la médiane de référence (7.8%).", "max_drawdown": -82.9, "lecture_baisse": "Baisse historique modérée : -82.9%, légèrement plus forte que la médiane de référence."}, {"company_id": "ebay", "name": "eBay", "country_code": "US", "name_fr": "les États-Unis", "revenue_cagr": 4.3, "ecart_croissance_pp": -7.5, "operating_margin": 20.5, "ecart_marge_pp": 13.0, "annualized_volatility": 30.9, "lecture_risque": "Risque contenu : volatilité 21.1 pp sous la médiane de référence.", "fcf_margin": 12.9, "lecture_cash": "Bonne capacité de trésorerie : 12.9% des revenus, 7.8 pp au-dessus de la médiane de référence.", "max_drawdown": -53.6, "lecture_baisse": "Bonne résistance : -53.6%, 28.9 pp de mieux que la médiane de référence."}, {"company_id": "etsy", "name": "Etsy", "country_code": "US", "name_fr": "les États-Unis", "revenue_cagr": 4.0, "ecart_croissance_pp": -7.8, "operating_margin": 12.8, "ecart_marge_pp": 5.2, "annualized_volatility": 58.2, "lecture_risque": "Risque modéré : volatilité légèrement supérieure à la médiane de référence.", "fcf_margin": 22.2, "lecture_cash": "Bonne capacité de trésorerie : 22.2% des revenus, 17.1 pp au-dessus de la médiane de référence.", "max_drawdown": -86.3, "lecture_baisse": "Baisse historique modérée : -86.3%, légèrement plus forte que la médiane de référence."}, {"company_id": "firstcry", "name": "Brainbees (FirstCry)", "country_code": "IN", "name_fr": "l'Inde", "revenue_cagr": 27.6, "ecart_croissance_pp": 15.8, "operating_margin": -2.3, "ecart_marge_pp": -9.9, "annualized_volatility": 50.8, "lecture_risque": "Risque contenu : volatilité 1.2 pp sous la médiane de référence.", "fcf_margin": -4.1, "lecture_cash": "Génération de trésorerie négative (-4.1% des revenus).", "max_drawdown": -71.2, "lecture_baisse": "Bonne résistance : -71.2%, 11.3 pp de mieux que la médiane de référence."}, {"company_id": "gotogroup", "name": "GoTo Group", "country_code": "ID", "name_fr": "l'Indonésie", "revenue_cagr": 17.3, "ecart_croissance_pp": 5.6, "operating_margin": -2.1, "ecart_marge_pp": -9.6, "annualized_volatility": 61.4, "lecture_risque": "Risque modéré : volatilité légèrement supérieure à la médiane de référence.", "fcf_margin": -4.8, "lecture_cash": "Génération de trésorerie négative (-4.8% des revenus).", "max_drawdown": -87.6, "lecture_baisse": "Baisse historique modérée : -87.6%, légèrement plus forte que la médiane de référence."}, {"company_id": "honasa", "name": "Honasa Consumer (Mamaearth)", "country_code": "IN", "name_fr": "l'Inde", "revenue_cagr": 29.9, "ecart_croissance_pp": 18.1, "operating_margin": 1.2, "ecart_marge_pp": -6.3, "annualized_volatility": 46.9, "lecture_risque": "Risque contenu : volatilité 5.1 pp sous la médiane de référence.", "fcf_margin": 4.0, "lecture_cash": "Génération de trésorerie proche de la médiane de référence (4.0%).", "max_drawdown": -62.9, "lecture_baisse": "Bonne résistance : -62.9%, 19.6 pp de mieux que la médiane de référence."}, {"company_id": "indiamart", "name": "IndiaMART InterMESH", "country_code": "IN", "name_fr": "l'Inde", "revenue_cagr": 16.8, "ecart_croissance_pp": 5.0, "operating_margin": 32.0, "ecart_marge_pp": 24.4, "annualized_volatility": 67.9, "lecture_risque": "Risque élevé : volatilité 15.9 pp au-dessus de la médiane de référence (43 entreprises).", "fcf_margin": 43.8, "lecture_cash": "Bonne capacité de trésorerie : 43.8% des revenus, 38.7 pp au-dessus de la médiane de référence.", "max_drawdown": -62.7, "lecture_baisse": "Bonne résistance : -62.7%, 19.8 pp de mieux que la médiane de référence."}, {"company_id": "infoedge", "name": "Info Edge (Naukri)", "country_code": "IN", "name_fr": "l'Inde", "revenue_cagr": 21.5, "ecart_croissance_pp": 9.8, "operating_margin": 31.0, "ecart_marge_pp": 23.5, "annualized_volatility": 36.7, "lecture_risque": "Risque contenu : volatilité 15.3 pp sous la médiane de référence.", "fcf_margin": 27.8, "lecture_cash": "Bonne capacité de trésorerie : 27.8% des revenus, 22.7 pp au-dessus de la médiane de référence.", "max_drawdown": -51.8, "lecture_baisse": "Bonne résistance : -51.8%, 30.6 pp de mieux que la médiane de référence."}, {"company_id": "instacart", "name": "Maplebear (Instacart)", "country_code": "US", "name_fr": "les États-Unis", "revenue_cagr": 13.6, "ecart_croissance_pp": 1.9, "operating_margin": 13.3, "ecart_marge_pp": 5.8, "annualized_volatility": 46.0, "lecture_risque": "Risque contenu : volatilité 6.0 pp sous la médiane de référence.", "fcf_margin": 24.3, "lecture_cash": "Bonne capacité de trésorerie : 24.3% des revenus, 19.2 pp au-dessus de la médiane de référence.", "max_drawdown": -38.0, "lecture_baisse": "Bonne résistance : -38.0%, 44.5 pp de mieux que la médiane de référence."}, {"company_id": "ixigo", "name": "Le Travenues (ixigo)", "country_code": "IN", "name_fr": "l'Inde", "revenue_cagr": 34.0, "ecart_croissance_pp": 22.3, "operating_margin": 8.0, "ecart_marge_pp": 0.4, "annualized_volatility": 52.0, "lecture_risque": "Risque modéré : volatilité légèrement supérieure à la médiane de référence.", "fcf_margin": 12.9, "lecture_cash": "Bonne capacité de trésorerie : 12.9% des revenus, 7.8 pp au-dessus de la médiane de référence.", "max_drawdown": -53.3, "lecture_baisse": "Bonne résistance : -53.3%, 29.2 pp de mieux que la médiane de référence."}, {"company_id": "jdcom", "name": "JD.com", "country_code": "CN", "name_fr": "la Chine", "revenue_cagr": 7.8, "ecart_croissance_pp": -4.0, "operating_margin": 0.3, "ecart_marge_pp": -7.3, "annualized_volatility": 46.9, "lecture_risque": "Risque contenu : volatilité 5.1 pp sous la médiane de référence.", "fcf_margin": 0.4, "lecture_cash": "Génération de trésorerie proche de la médiane de référence (0.4%).", "max_drawdown": -79.1, "lecture_baisse": "Résistance proche de la médiane de référence (-79.1%)."}, {"company_id": "mercadolibre", "name": "MercadoLibre", "country_code": "AR", "name_fr": "l'Argentine", "revenue_cagr": 38.9, "ecart_croissance_pp": 27.2, "operating_margin": 11.1, "ecart_marge_pp": 3.5, "annualized_volatility": 47.1, "lecture_risque": "Risque contenu : volatilité 4.9 pp sous la médiane de référence.", "fcf_margin": 37.3, "lecture_cash": "Bonne capacité de trésorerie : 37.3% des revenus, 32.2 pp au-dessus de la médiane de référence.", "max_drawdown": -69.1, "lecture_baisse": "Bonne résistance : -69.1%, 13.4 pp de mieux que la médiane de référence."}, {"company_id": "nykaa", "name": "Nykaa (FSN E-Commerce)", "country_code": "IN", "name_fr": "l'Inde", "revenue_cagr": 28.1, "ecart_croissance_pp": 16.3, "operating_margin": 2.7, "ecart_marge_pp": -4.8, "annualized_volatility": 38.0, "lecture_risque": "Risque contenu : volatilité 14.0 pp sous la médiane de référence.", "fcf_margin": 4.3, "lecture_cash": "Génération de trésorerie proche de la médiane de référence (4.3%).", "max_drawdown": -72.1, "lecture_baisse": "Bonne résistance : -72.1%, 10.4 pp de mieux que la médiane de référence."}, {"company_id": "ocado", "name": "Ocado Group", "country_code": "GB", "name_fr": "le Royaume-Uni", "revenue_cagr": -18.1, "ecart_croissance_pp": -29.8, "operating_margin": -15.4, "ecart_marge_pp": -23.0, "annualized_volatility": 55.4, "lecture_risque": "Risque modéré : volatilité légèrement supérieure à la médiane de référence.", "fcf_margin": -2.6, "lecture_cash": "Génération de trésorerie négative (-2.6% des revenus).", "max_drawdown": -94.0, "lecture_baisse": "Baisse historique sévère : -94.0%, 11.6 pp de plus que la médiane de référence."}, {"company_id": "paypal", "name": "PayPal Holdings", "country_code": "US", "name_fr": "les États-Unis", "revenue_cagr": 6.4, "ecart_croissance_pp": -5.3, "operating_margin": 19.3, "ecart_marge_pp": 11.7, "annualized_volatility": 38.8, "lecture_risque": "Risque contenu : volatilité 13.2 pp sous la médiane de référence.", "fcf_margin": 16.8, "lecture_cash": "Bonne capacité de trésorerie : 16.8% des revenus, 11.7 pp au-dessus de la médiane de référence.", "max_drawdown": -87.3, "lecture_baisse": "Baisse historique modérée : -87.3%, légèrement plus forte que la médiane de référence."}, {"company_id": "paytm", "name": "One 97 Communications (Paytm)", "country_code": "IN", "name_fr": "l'Inde", "revenue_cagr": 2.2, "ecart_croissance_pp": -9.5, "operating_margin": -0.5, "ecart_marge_pp": -8.0, "annualized_volatility": 52.7, "lecture_risque": "Risque modéré : volatilité légèrement supérieure à la médiane de référence.", "fcf_margin": -14.5, "lecture_cash": "Génération de trésorerie négative (-14.5% des revenus).", "max_drawdown": -82.4, "lecture_baisse": "Résistance proche de la médiane de référence (-82.4%)."}, {"company_id": "pinduoduo", "name": "PDD Holdings (Pinduoduo)", "country_code": "CN", "name_fr": "la Chine", "revenue_cagr": 49.0, "ecart_croissance_pp": 37.3, "operating_margin": 21.6, "ecart_marge_pp": 14.0, "annualized_volatility": 68.5, "lecture_risque": "Risque élevé : volatilité 16.5 pp au-dessus de la médiane de référence (43 entreprises).", "fcf_margin": 24.5, "lecture_cash": "Bonne capacité de trésorerie : 24.5% des revenus, 19.4 pp au-dessus de la médiane de référence.", "max_drawdown": -87.4, "lecture_baisse": "Baisse historique modérée : -87.4%, légèrement plus forte que la médiane de référence."}, {"company_id": "policybazaar", "name": "PB Fintech (Policybazaar)", "country_code": "IN", "name_fr": "l'Inde", "revenue_cagr": 38.5, "ecart_croissance_pp": 26.8, "operating_margin": 5.5, "ecart_marge_pp": -2.0, "annualized_volatility": 45.9, "lecture_risque": "Risque contenu : volatilité 6.1 pp sous la médiane de référence.", "fcf_margin": -0.6, "lecture_cash": "Génération de trésorerie négative (-0.6% des revenus).", "max_drawdown": -74.3, "lecture_baisse": "Résistance proche de la médiane de référence (-74.3%)."}, {"company_id": "rakuten", "name": "Rakuten Group", "country_code": "JP", "name_fr": "le Japon", "revenue_cagr": 9.1, "ecart_croissance_pp": -2.6, "operating_margin": 0.6, "ecart_marge_pp": -7.0, "annualized_volatility": 37.0, "lecture_risque": "Risque contenu : volatilité 15.0 pp sous la médiane de référence.", "fcf_margin": 8.7, "lecture_cash": "Génération de trésorerie proche de la médiane de référence (8.7%).", "max_drawdown": -79.2, "lecture_baisse": "Résistance proche de la médiane de référence (-79.2%)."}, {"company_id": "revolve", "name": "Revolve Group", "country_code": "US", "name_fr": "les États-Unis", "revenue_cagr": 3.6, "ecart_croissance_pp": -8.1, "operating_margin": 6.1, "ecart_marge_pp": -1.5, "annualized_volatility": 66.8, "lecture_risque": "Risque élevé : volatilité 14.7 pp au-dessus de la médiane de référence (43 entreprises).", "fcf_margin": 3.9, "lecture_cash": "Génération de trésorerie proche de la médiane de référence (3.9%).", "max_drawdown": -85.7, "lecture_baisse": "Baisse historique modérée : -85.7%, légèrement plus forte que la médiane de référence."}, {"company_id": "sea", "name": "Sea Limited (Shopee)", "country_code": "SG", "name_fr": "Singapour", "revenue_cagr": 22.6, "ecart_croissance_pp": 10.9, "operating_margin": 8.7, "ecart_marge_pp": 1.1, "annualized_volatility": 62.3, "lecture_risque": "Risque élevé : volatilité 10.3 pp au-dessus de la médiane de référence (43 entreprises).", "fcf_margin": 19.6, "lecture_cash": "Bonne capacité de trésorerie : 19.6% des revenus, 14.5 pp au-dessus de la médiane de référence.", "max_drawdown": -90.5, "lecture_baisse": "Baisse historique modérée : -90.5%, légèrement plus forte que la médiane de référence."}, {"company_id": "shopify", "name": "Shopify", "country_code": "CA", "name_fr": "le Canada", "revenue_cagr": 27.3, "ecart_croissance_pp": 15.6, "operating_margin": 16.3, "ecart_marge_pp": 8.8, "annualized_volatility": 60.3, "lecture_risque": "Risque modéré : volatilité légèrement supérieure à la médiane de référence.", "fcf_margin": 17.4, "lecture_cash": "Bonne capacité de trésorerie : 17.4% des revenus, 12.3 pp au-dessus de la médiane de référence.", "max_drawdown": -84.8, "lecture_baisse": "Baisse historique modérée : -84.8%, légèrement plus forte que la médiane de référence."}, {"company_id": "stitchfix", "name": "Stitch Fix", "country_code": "US", "name_fr": "les États-Unis", "revenue_cagr": -14.4, "ecart_croissance_pp": -26.1, "operating_margin": -3.1, "ecart_marge_pp": -10.6, "annualized_volatility": 84.0, "lecture_risque": "Risque élevé : volatilité 32.0 pp au-dessus de la médiane de référence (43 entreprises).", "fcf_margin": 0.7, "lecture_cash": "Génération de trésorerie proche de la médiane de référence (0.7%).", "max_drawdown": -98.0, "lecture_baisse": "Baisse historique sévère : -98.0%, 15.5 pp de plus que la médiane de référence."}, {"company_id": "stoneco", "name": "StoneCo", "country_code": "BR", "name_fr": "le Brésil", "revenue_cagr": 14.1, "ecart_croissance_pp": 2.4, "operating_margin": 52.0, "ecart_marge_pp": 44.4, "annualized_volatility": 67.7, "lecture_risque": "Risque élevé : volatilité 15.7 pp au-dessus de la médiane de référence (43 entreprises).", "fcf_margin": -3.8, "lecture_cash": "Génération de trésorerie négative (-3.8% des revenus).", "max_drawdown": -92.3, "lecture_baisse": "Baisse historique modérée : -92.3%, légèrement plus forte que la médiane de référence."}, {"company_id": "vipshop", "name": "Vipshop", "country_code": "CN", "name_fr": "la Chine", "revenue_cagr": 0.9, "ecart_croissance_pp": -10.8, "operating_margin": 7.5, "ecart_marge_pp": 0.0, "annualized_volatility": 55.9, "lecture_risque": "Risque modéré : volatilité légèrement supérieure à la médiane de référence.", "fcf_margin": 5.1, "lecture_cash": "Génération de trésorerie proche de la médiane de référence (5.1%).", "max_drawdown": -86.7, "lecture_baisse": "Baisse historique modérée : -86.7%, légèrement plus forte que la médiane de référence."}, {"company_id": "wayfair", "name": "Wayfair", "country_code": "US", "name_fr": "les États-Unis", "revenue_cagr": 0.6, "ecart_croissance_pp": -11.1, "operating_margin": 0.7, "ecart_marge_pp": -6.8, "annualized_volatility": 73.2, "lecture_risque": "Risque élevé : volatilité 21.2 pp au-dessus de la médiane de référence (43 entreprises).", "fcf_margin": 2.6, "lecture_cash": "Génération de trésorerie proche de la médiane de référence (2.6%).", "max_drawdown": -93.0, "lecture_baisse": "Baisse historique sévère : -93.0%, 10.5 pp de plus que la médiane de référence."}, {"company_id": "zalando", "name": "Zalando", "country_code": "DE", "name_fr": "l'Allemagne", "revenue_cagr": 6.1, "ecart_croissance_pp": -5.7, "operating_margin": 3.1, "ecart_marge_pp": -4.4, "annualized_volatility": 42.4, "lecture_risque": "Risque contenu : volatilité 9.6 pp sous la médiane de référence.", "fcf_margin": 7.3, "lecture_cash": "Génération de trésorerie proche de la médiane de référence (7.3%).", "max_drawdown": -84.4, "lecture_baisse": "Baisse historique modérée : -84.4%, légèrement plus forte que la médiane de référence."}, {"company_id": "zomato", "name": "Eternal (Zomato)", "country_code": "IN", "name_fr": "l'Inde", "revenue_cagr": 97.7, "ecart_croissance_pp": 86.0, "operating_margin": -0.7, "ecart_marge_pp": -8.3, "annualized_volatility": 48.3, "lecture_risque": "Risque contenu : volatilité 3.7 pp sous la médiane de référence.", "fcf_margin": -2.1, "lecture_cash": "Génération de trésorerie négative (-2.1% des revenus).", "max_drawdown": -74.0, "lecture_baisse": "Résistance proche de la médiane de référence (-74.0%)."}], "company_aliases": {"zomato": ["eternal", "eternal (zomato)", "eternal zomato", "zomato"], "paytm": ["one 97", "one 97 communications (paytm)", "one 97 paytm", "paytm"], "ixigo": ["ixigo", "le travenues", "le travenues (ixigo)", "travenues"], "firstcry": ["brainbees", "brainbees (firstcry)", "brainbees firstcry", "firstcry"], "honasa": ["honasa", "honasa consumer", "honasa consumer (mamaearth)", "honasa mamaearth", "mamaearth"], "nykaa": ["fsn", "nykaa", "nykaa (fsn e-commerce)", "nykaa fsn"], "boohoo": ["boohoo", "debenhams", "debenhams formerly boohoo", "debenhams group", "debenhams group (formerly boohoo)"], "policybazaar": ["pb fintech", "pb fintech (policybazaar)", "policybazaar"], "sea": ["sea limited", "sea limited (shopee)", "sea shopee", "shopee"], "instacart": ["instacart", "maplebear", "maplebear (instacart)", "maplebear instacart"], "coupang": ["coupang"], "pinduoduo": ["pdd", "pdd holdings", "pdd holdings (pinduoduo)", "pdd pinduoduo", "pinduoduo", "temu"], "affirm": ["affirm", "affirm holdings"], "alibaba": ["alibaba", "alibaba group"], "allegro": ["allegro.eu"], "amazon": ["amazon.com"], "ao": ["ao world"], "asos": ["asos"], "autotrader": ["auto trader", "auto trader group"], "block": ["block", "block inc", "block, inc."], "cartrade": ["cartrade", "cartrade tech"], "carvana": ["carvana"], "chewy": ["chewy"], "delhivery": ["delhivery"], "doordash": ["doordash"], "easetrip": ["easy trip", "easy trip planners"], "ebay": ["ebay"], "etsy": ["etsy"], "gotogroup": ["goto", "goto group"], "indiamart": ["indiamart intermesh"], "infoedge": ["info edge", "info edge (naukri)"], "jdcom": ["jd.com"], "mercadolibre": ["mercadolibre"], "ocado": ["ocado", "ocado group"], "paypal": ["paypal", "paypal holdings"], "rakuten": ["rakuten", "rakuten group"], "revolve": ["revolve", "revolve group"], "shopify": ["shopify"], "stitchfix": ["stitch fix"], "stoneco": ["stoneco"], "vipshop": ["vipshop"], "wayfair": ["wayfair"], "zalando": ["zalando"]}, "aliases": {"US": ["etats-unis", "etats unis", "usa"], "CN": ["chine"], "AR": ["argentine"], "SG": ["singapour"], "IN": ["inde"], "JP": ["japon"], "CA": ["canada"], "PL": ["pologne"], "DE": ["allemagne"], "BR": ["bresil"], "KR": ["coree du sud", "coree"], "GB": ["royaume-uni", "royaume uni", "uk", "angleterre"], "ID": ["indonesie"]}, "benchmarks_global": {"croissance_ca_mediane_pct": 11.7, "marge_operationnelle_mediane_pct": 7.5, "fcf_margin_mediane_pct": 5.1, "volatilite_mediane_pct": 52.0, "max_drawdown_median_pct": -82.5, "n_entreprises": 43, "annee_reference_score_pays": 2024}}</script>
 <script>
 const DATA = JSON.parse(document.getElementById('agent-data').textContent);
 const chat = document.getElementById('chat');
@@ -782,31 +218,94 @@ const chat = document.getElementById('chat');
 const EXTERNAL_BRIEFS = {
   IN: {
     date: "20/09/2026",
-    pb_signaux: "Vue 2 (Benchmark) : profil mixte sur les 12 acteurs suivis — 5 « Leaders de croissance » (CarTrade, EaseMyTrip, IndiaMART, Info Edge, Ixigo), 5 « Croissance à coût élevé » (dont Zomato, Nykaa, Honasa, Policybazaar, FirstCry), 2 « Sous pression » (Delhivery, Paytm). Vue 3 (Risque) : majorité classée « Volatils mais solides » (trésorerie positive malgré une volatilité élevée).",
-    contexte_externe: "Le 23/07/2026, l'Inde a assoupli ses règles d'investissement étranger dans l'e-commerce (Press Note 3, 2026), en vigueur depuis le 05/08/2026 : les acteurs à capital étranger peuvent désormais détenir leur propre inventaire, mais <strong>uniquement pour exporter des produits fabriqués en Inde</strong>.",
-    confirmes: "La dynamique de croissance des acteurs suivis (revenu, marges) reste valide et n'est pas contredite par cette actualité.",
-    nuances: "Le profil « Leaders de croissance » de plusieurs acteurs suggère une opportunité large côté vente directe ; en réalité, la vente domestique à capital étranger reste interdite (modèle marketplace obligatoire) — l'assouplissement ne bénéficie qu'à un modèle export/sourcing.",
-    opportunites: "Un modèle « sourcing + export depuis l'Inde » bénéficierait directement de cet assouplissement.",
-    risques: "Toute stratégie de vente directe aux consommateurs indiens nécessite toujours un partenaire local (marketplace) — pas de contrôle total de la distribution.",
-    manquantes: "Calendrier d'une éventuelle libéralisation future pour la vente domestique ; réaction des acteurs domestiques (Flipkart, Reliance) à ce changement.",
+    score: 31.1,
+    orientation_pbi: "Réévaluer avant d'investir",
+    pb_signaux: [
+      "Score d'attractivité 2024 : <strong>31,1/100</strong> — le plus bas des 13 marchés avec l'Indonésie",
+      "Pouvoir d'achat 0/100 (PIB/hab. le plus faible) et maturité numérique 0/100 (internet le plus faible)",
+      "Mais meilleur score de taille de marché : 100/100 (1,45 Md d'habitants)",
+      "Sur le terrain : 12 entreprises suivies, croissance moyenne <strong>30,8%/an</strong>, 10/12 au-dessus de la médiane mondiale (11,7%)",
+      "CarTrade, IndiaMART, Info Edge : marges opérationnelles &gt;28%, trésorerie largement au-dessus de la médiane",
+    ],
+    contexte_externe: [
+      "23/07/2026 : l'Inde assouplit ses règles d'investissement étranger dans l'e-commerce (Press Note 3, 2026)",
+      "En vigueur depuis le 05/08/2026",
+      "Les acteurs à capital étranger peuvent détenir leur propre inventaire — <strong>uniquement pour exporter</strong> des produits fabriqués en Inde",
+    ],
+    confirmes: [
+      "La sur-performance des acteurs suivis n'est pas un accident statistique",
+      "Cohérente avec un marché encore en phase de rattrapage numérique et de pouvoir d'achat → marge de croissance plus longue",
+    ],
+    nuances: [
+      "Le score (31,1/100) est un <strong>rang relatif</strong>, pas une mesure absolue : un pays peut être dernier en niveau et premier en dynamique (Zomato : +97,7%/an)",
+      "L'assouplissement du 23/07 ne profite qu'au modèle export/sourcing — la vente domestique à capital étranger reste interdite (marketplace obligatoire)",
+    ],
+    opportunites: [
+      "Modèle « sourcing + export depuis l'Inde » directement renforcé par l'assouplissement réglementaire",
+      "Le retard numérique (score 0/100) est aussi la principale réserve de croissance future pour un acteur déjà implanté",
+    ],
+    risques: [
+      "Vente directe aux consommateurs indiens : toujours besoin d'un partenaire local (marketplace)",
+      "Dynamique d'investissement (IDE) faible : 33,3/100",
+    ],
+    manquantes: [
+      "Calendrier d'une éventuelle libéralisation future pour la vente domestique",
+      "Réaction des acteurs domestiques (Flipkart, Reliance) à ce changement",
+    ],
     sources: ['<a href="https://www.india-briefing.com/news/india-fdi-inventory-based-e-commerce-exports-rule-change-46324.html/" target="_blank" rel="noopener">India Briefing — India Eases FDI Rules for Inventory-Based E-Commerce Exports</a> (23/07/2026)'],
     orientation: "investir",
-    orientation_note: "À approfondir : investir si le modèle d'entrée retenu est export/sourcing. Prudence si l'objectif est la vente directe au consommateur indien.",
+    orientation_note: "Le score Power BI seul (« Réévaluer avant d'investir ») sous-estime largement la dynamique réelle des acteurs — investir en priorité sur un modèle export/sourcing plutôt que sur la vente directe.",
   },
   GB: {
     date: "20/09/2026",
-    pb_signaux: "Vue 2 (Benchmark) : 4 des 5 acteurs suivis (AO World, ASOS, Debenhams/Boohoo, Ocado) classés « Sous pression » (croissance et marge sous la médiane des 43 entreprises) ; seul Auto Trader Group ressort « Matures et rentables ». Vue 3 (Risque) : Boohoo et Ocado classés « Vulnérables » (trésorerie négative et volatilité élevée).",
-    contexte_externe: "Le rapport Retail Economics (UK Retail and Leisure Outlook 2026) prévoit une croissance du PIB réel de seulement 1 à 1,5% en 2026, avec des pressions de coûts fortes (charges salariales, taxes locales, énergie, tarifs douaniers) — 6 entreprises sur 10 rapportent une confiance réduite depuis le budget d'automne 2025.",
-    confirmes: "Le ralentissement identifié dans le benchmark n'est pas un accident ponctuel : le contexte macro et réglementaire se détériore pour l'ensemble du secteur, pas seulement pour les acteurs suivis.",
-    nuances: "La consommation ne s'effondre pas uniformément : les ménages « digitalement à l'aise et financièrement résilients » continuent de dépenser, ce qui pourrait favoriser un acteur en ligne bien positionné plutôt que justifier un retrait total du marché.",
-    opportunites: "Cibler spécifiquement le segment de consommateurs résilients plutôt que le marché de masse pourrait limiter l'exposition aux pressions de coûts généralisées.",
-    risques: "Les pressions de coûts (énergie, charges, tarifs) continueront de peser sur les marges des acteurs déjà fragiles suivis dans le benchmark.",
-    manquantes: "Impact précis des tarifs douaniers sur les coûts d'import pour un acteur comme Shop-EY ; détail des mesures du budget d'automne 2025 spécifiques au commerce de détail.",
-    sources: ['<a href="https://www.retaileconomics.co.uk/retail-insights/thought-leadership-reports/uk-retail-and-leisure-outlook-2026" target="_blank" rel="noopener">Retail Economics — UK Retail and Leisure Outlook 2026</a> (2026)'],
+    score: 57.8,
+    orientation_pbi: "Maintenir et optimiser",
+    pb_signaux: [
+      "Score d'attractivité 2024 : <strong>57,8/100</strong> — milieu de tableau",
+      "Porté par une forte maturité numérique (91,7/100) et un bon pouvoir d'achat (66,7/100)",
+      "Pénalisé par une dynamique d'investissement (IDE) nulle : 0/100",
+      "Sur le terrain : 5 entreprises suivies, croissance moyenne <strong>-10,6%/an</strong>, aucune au-dessus de la médiane mondiale (11,7%)",
+      "Seul Auto Trader Group tire son épingle du jeu (marge 62,1%, trésorerie 50% des revenus)",
+      "AO World, ASOS, Debenhams (ex-Boohoo) et Ocado : croissance négative et baisses historiques sévères (-91% à -98%)",
+    ],
+    contexte_externe: [
+      "Retail Economics (UK Retail and Leisure Outlook 2026) : croissance du PIB réel attendue à seulement 1-1,5% en 2026",
+      "Pressions de coûts fortes : charges salariales, taxes locales, énergie, tarifs douaniers",
+      "6 entreprises sur 10 rapportent une confiance réduite depuis le budget d'automne 2025",
+    ],
+    confirmes: [
+      "Le contexte macro-réglementaire dégradé confirme la faiblesse quasi générale des acteurs suivis — pas un accident isolé",
+      "Cohérent avec la projection FMI d'un ralentissement du PIB britannique (1,3% en 2026 contre 2,8%/an en moyenne historique)",
+    ],
+    nuances: [
+      "Le score (57,8/100) reflète des fondamentaux réels (taille, pouvoir d'achat, digital) mais pas la dégradation compétitive actuelle du secteur retail suivi",
+      "La consommation ne s'effondre pas uniformément : les ménages résilients continuent de dépenser, ce qui explique la résilience d'un acteur de niche comme Auto Trader Group",
+    ],
+    opportunites: [
+      "Cibler le segment de consommateurs résilients plutôt que le marché de masse",
+      "Un modèle de plateforme/comparateur proche d'Auto Trader Group plutôt qu'un modèle d'inventaire direct limiterait l'exposition aux pressions de coûts",
+    ],
+    risques: [
+      "Pressions de coûts (énergie, charges, tarifs) qui continueront de peser sur des marges déjà fragiles",
+      "Ralentissement du PIB prévu par le FMI — le score macro « moyen » ne doit pas être lu comme un feu vert",
+    ],
+    manquantes: [
+      "Impact précis des tarifs douaniers sur les coûts d'import pour un acteur comme Shop-EY",
+      "Détail des mesures du budget d'automne 2025 spécifiques au commerce de détail",
+    ],
+    sources: ['<a href="https://www.retaileconomics.co.uk/retail-insights/thought-leadership-reports/uk-retail-and-leisure-outlook-2026" target="_blank" rel="noopener">Retail Economics — UK Retail and Leisure Outlook 2026</a> (2026)', 'FMI, World Economic Outlook, octobre 2025 (projection PIB 2026)'],
     orientation: "reevaluer",
-    orientation_note: "À approfondir : pas de renforcement sans stratégie de niche claire vers les consommateurs résilients identifiés.",
+    orientation_note: "Le score Power BI (« Maintenir et optimiser ») ne reflète pas la dégradation concurrentielle actuelle — pas de renforcement généralisé sans stratégie de niche claire.",
   },
 };
+
+function extSection(num, title, items) {
+  const lis = items.map(t => `<li>${t}</li>`).join("");
+  return `<div class="ext-section">
+    <div class="ext-section-title"><span class="ext-num">${num}</span> ${title}</div>
+    <ul class="ext-list">${lis}</ul>
+  </div>`;
+}
 
 function externalBriefHTML(code) {
   const b = EXTERNAL_BRIEFS[code];
@@ -814,21 +313,26 @@ function externalBriefHTML(code) {
   const row = scoreRow(code);
   const orientLabel = { investir: "Investir", maintenir: "Maintenir", reevaluer: "Réévaluer" }[b.orientation];
   const orientClass = "orient-" + b.orientation;
-  return `
-    <div class="ext-brief">
-      <div class="ext-head">🌐 Agent de veille décisionnelle Shop-EY — ${row.name_fr} <span class="ext-date">${b.date}</span></div>
-      <div class="ext-row"><strong>1. Signaux Power BI :</strong> ${b.pb_signaux}</div>
-      <div class="ext-row"><strong>2. Contexte externe récent :</strong> ${b.contexte_externe}</div>
-      <div class="ext-row"><strong>3. Éléments qui confirment :</strong> ${b.confirmes}</div>
-      <div class="ext-row"><strong>4. Éléments qui nuancent / contredisent :</strong> ${b.nuances}</div>
-      <div class="ext-row"><strong>5. Opportunités :</strong> ${b.opportunites}</div>
-      <div class="ext-row"><strong>6. Risques :</strong> ${b.risques}</div>
-      <div class="ext-row"><strong>7. Informations manquantes :</strong> ${b.manquantes}</div>
-      <div class="ext-row"><strong>8. Sources et dates :</strong> ${b.sources.join(", ")}</div>
-      <div class="ext-row"><strong>9. Orientation à approfondir :</strong></div>
-      <div class="orient-badge ${orientClass}">${orientLabel}</div>
-      <div class="ext-row" style="margin-top:6px;"><em>${b.orientation_note} — la décision finale reste humaine.</em></div>
-    </div>`;
+  let html = `<div class="ext-brief">
+    <div class="ext-head">MarketLens — Veille sur ${row.name_fr} <span class="ext-date">${b.date}</span></div>`;
+  html += extSection(1, "Signaux Power BI", b.pb_signaux);
+  html += extSection(2, "Contexte externe récent", b.contexte_externe);
+  html += extSection(3, "Ce qui confirme le signal", b.confirmes);
+  html += extSection(4, "Ce qui nuance / contredit", b.nuances);
+  html += extSection(5, "Opportunités", b.opportunites);
+  html += extSection(6, "Risques", b.risques);
+  html += extSection(7, "Informations manquantes", b.manquantes);
+  html += `<div class="ext-section">
+    <div class="ext-section-title"><span class="ext-num">8</span> Sources et dates</div>
+    <ul class="ext-list"><li>${b.sources.join("</li><li>")}</li></ul>
+  </div>`;
+  html += `<div class="ext-section">
+    <div class="ext-section-title"><span class="ext-num">9</span> Orientation à approfondir</div>
+    <div class="orient-badge ${orientClass}">${orientLabel}</div>
+    <div class="ext-note">${b.orientation_note}<br><em>La décision finale reste humaine.</em></div>
+  </div>`;
+  html += `</div>`;
+  return html;
 }
 
 function stripAccents(s) {
@@ -861,9 +365,28 @@ function findCountries(text) {
   return ordered;
 }
 
-function tagClass(q) {
-  return { "Investir": "invest", "Renforcer sélectivement": "renforcer",
-           "Optimiser": "optimiser", "Sortir / réduire": "sortir" }[q];
+function findCompanies(text) {
+  const t = stripAccents(text);
+  const found = [];
+  for (const [id, aliases] of Object.entries(DATA.company_aliases)) {
+    for (const a of aliases) {
+      const clean = stripAccents(a);
+      const re = new RegExp('(^|[^a-z0-9])' + escapeRegex(clean) + '($|[^a-z0-9])');
+      if (re.test(t)) { found.push(id); break; }
+    }
+  }
+  return [...new Set(found)];
+}
+
+function tagClass(orientation) {
+  // Reprend exactement les seuils de la mesure DAX "Couleur Jauge Attractivité"
+  return {
+    "Prioriser l'investissement": "prioriser",
+    "Poursuivre les investissements": "poursuivre",
+    "Maintenir et optimiser": "maintenir",
+    "Investir de façon sélective": "selective",
+    "Réévaluer avant d'investir": "reevaluer",
+  }[orientation];
 }
 
 function scoreRow(code) {
@@ -878,27 +401,98 @@ function addMessage(role, html) {
   chat.scrollTop = chat.scrollHeight;
 }
 
+function pct(v) { return (v === null || v === undefined) ? "n/d" : v + "%"; }
+
+function plural(n, singular, plural_) {
+  return n <= 1 ? singular : (plural_ || singular + "s");
+}
+function entreprises(n) { return n <= 1 ? "entreprise" : "entreprises"; }
+function suivies(n) { return n <= 1 ? "suivie" : "suivies"; }
+
 function briefCardHTML(code) {
-  const row = scoreRow(code);
-  const tag = `<span class="tag tag-${tagClass(row.quadrant)}">${row.quadrant}</span>`;
-  return `<strong>${row.name_fr}</strong> ${tag}<br>${DATA.briefs[code]}`;
+  const b = DATA.briefs[code];
+  const tag = `<span class="tag tag-${tagClass(b.orientation)}">${b.orientation} · ${b.score_attractivite}/100</span>`;
+  const s = b.subscores;
+  let html = `<strong>${b.name_fr}</strong> ${tag}`;
+  html += `<div class="score-mini">
+    <span class="score-chip">Taille marché <strong>${s.taille}</strong></span>
+    <span class="score-chip">Pouvoir d'achat <strong>${s.pouvoir_achat}</strong></span>
+    <span class="score-chip">Croissance PIB <strong>${s.croissance_pib ?? "n/d"}</strong></span>
+    <span class="score-chip">Maturité digitale <strong>${s.maturite_digitale}</strong></span>
+    <span class="score-chip">Dynamique IDE <strong>${s.dynamique_investissement}</strong></span>
+  </div>`;
+  if (b.n_companies) {
+    html += `<div class="brief-line"><strong>${b.n_companies} ${entreprises(b.n_companies)} e-commerce ${suivies(b.n_companies)}</strong></div>`;
+    html += `<ul class="exec-list">`;
+    html += `<li>Croissance moyenne du revenu : <strong>${pct(b.avg_growth_pct)}/an</strong></li>`;
+    html += `<li>Marge opérationnelle moyenne : <strong>${pct(b.avg_margin_pct)}</strong></li>`;
+    html += `<li><strong>${b.n_above_growth_benchmark}/${b.n_companies}</strong> au-dessus de la médiane mondiale de croissance (11,7%, base 43 entreprises)</li>`;
+    if (b.top_company) html += `<li>Meilleure performance : <strong>${b.top_company.name}</strong> (${pct(b.top_company.growth_pct)})</li>`;
+    if (b.weak_company && b.weak_company.name !== b.top_company?.name) html += `<li>Plus en difficulté : <strong>${b.weak_company.name}</strong> (${pct(b.weak_company.growth_pct)})</li>`;
+    html += `</ul>`;
+  }
+  html += `<div class="brief-line"><strong>Recommandation :</strong> ${b.reco_text}</div>`;
+  if (b.projection) {
+    html += `<div class="brief-line"><strong>Projection FMI 2026 :</strong> ${b.projection.proj_2026_pct}% de croissance du PIB (vs ${b.projection.hist_pct}%/an en moyenne historique) → ${b.projection.label}.</div>`;
+  }
+  if (EXTERNAL_BRIEFS[code]) {
+    html += `<div class="brief-line" style="color:var(--text-2);font-size:0.78rem;">Une investigation externe (réglementation, actualité) est disponible pour ce marché — demande « contexte externe ${b.name_fr} ».</div>`;
+  }
+  return html;
+}
+
+function companyCardHTML(id) {
+  const c = DATA.companies.find(r => r.company_id === id);
+  if (!c) return null;
+  const row = scoreRow(c.country_code);
+  let html = `<strong>${c.name}</strong> <span class="tag" style="background:#e4e4de;color:var(--text);">${c.name_fr}</span>`;
+  html += `<div class="brief-line"><strong>Croissance du revenu :</strong> ${pct(c.revenue_cagr)}/an (${c.ecart_croissance_pp >= 0 ? "+" : ""}${c.ecart_croissance_pp} pp vs médiane des 43 entreprises).</div>`;
+  html += `<div class="brief-line"><strong>Marge opérationnelle :</strong> ${pct(c.operating_margin)} (${c.ecart_marge_pp >= 0 ? "+" : ""}${c.ecart_marge_pp} pp vs médiane).</div>`;
+  html += `<div class="brief-line">${c.lecture_risque}</div>`;
+  html += `<div class="brief-line">${c.lecture_cash}</div>`;
+  html += `<div class="brief-line">${c.lecture_baisse}</div>`;
+  if (row) html += `<div class="brief-line" style="color:var(--text-2);font-size:0.78rem;">Marché (${c.name_fr}) : score d'attractivité ${row.score_attractivite}/100 → ${row.orientation}. Demande « analyse ${c.name_fr} » pour le détail pays.</div>`;
+  return html;
 }
 
 function handlePrioritize() {
-  const groups = DATA.quadrant_groups;
-  const order = ["Investir", "Renforcer sélectivement", "Optimiser", "Sortir / réduire"];
-  let html = "Voici comment les 13 marchés se répartissent :<br><br>";
+  const groups = DATA.orientation_groups;
+  const order = DATA.orientation_order;
+  let html = "Voici comment les 13 marchés se répartissent selon le score d'attractivité Power BI (score de rang pondéré : taille, pouvoir d'achat, croissance PIB, maturité digitale, dynamique IDE) :<br>";
   for (const q of order) {
-    const list = (groups[q] || []).map(c => c.name_fr).join(", ");
-    html += `<span class="tag tag-${tagClass(q)}">${q}</span> ${list || "—"}<br><br>`;
+    const list = groups[q] || [];
+    html += `<br><span class="tag tag-${tagClass(q)}">${q}</span><div style="margin-top:4px;">`;
+    if (!list.length) {
+      html += `<span class="prio-detail">—</span>`;
+    } else {
+      for (const c of list) {
+        const growthTxt = c.avg_growth_pct !== null && c.avg_growth_pct !== undefined
+          ? `croissance ${entreprises(c.n_companies)} ${c.avg_growth_pct}%/an (${c.n_companies} ${suivies(c.n_companies)})`
+          : "pas d'entreprise suivie";
+        html += `<div class="prio-row"><span class="prio-name">${c.name_fr}</span><span class="prio-detail">${c.score}/100 · ${growthTxt}</span></div>`;
+      }
+    }
+    html += `</div>`;
   }
-  html += "Tape le nom d'un marché pour avoir le détail (ex. « analyse l'Inde »).";
+  html += "<br>Tape le nom d'un marché pour le détail complet (ex. « analyse l'Inde »), ou « pourquoi » pour creuser un cas précis.";
+  addMessage('agent', html);
+}
+
+function handleBest(text) {
+  const t = stripAccents(text);
+  const worst = /risqu|eviter|pire|moins attractif|ne pas investir|prudence/.test(t);
+  const sorted = [...DATA.scorecard].sort((a, b) => worst ? a.score_attractivite - b.score_attractivite : b.score_attractivite - a.score_attractivite);
+  const top = sorted.slice(0, 3);
+  let html = worst
+    ? "Les marchés avec le score d'attractivité Power BI le plus faible :<br><br>"
+    : "Les marchés avec le meilleur score d'attractivité Power BI :<br><br>";
+  for (const r of top) html += briefCardHTML(r.code) + "<br><br>";
   addMessage('agent', html);
 }
 
 function handleCompare(codes) {
   let html = "Comparaison :<br><br>";
-  for (const c of codes.slice(0, 2)) {
+  for (const c of codes.slice(0, 3)) {
     html += briefCardHTML(c) + "<br><br>";
   }
   addMessage('agent', html);
@@ -906,6 +500,15 @@ function handleCompare(codes) {
 
 function handleSingleCountry(code) {
   addMessage('agent', briefCardHTML(code));
+}
+
+function handleCompanies(ids) {
+  let html = "";
+  for (const id of ids.slice(0, 3)) {
+    const card = companyCardHTML(id);
+    if (card) html += card + "<br><br>";
+  }
+  addMessage('agent', html || "Je n'ai pas retrouvé cette entreprise dans les 43 suivies.");
 }
 
 function nearbyNumber(t, keywordRe) {
@@ -919,7 +522,7 @@ function nearbyNumber(t, keywordRe) {
   return null;
 }
 
-function handleGrowthQuery(text) {
+function handleGrowthQuery(text, countryFilter) {
   const t = stripAccents(text);
   let minGrowth = nearbyNumber(t, /croissance|grandi/);
   let maxVol = nearbyNumber(t, /risque|volatilit/);
@@ -928,12 +531,15 @@ function handleGrowthQuery(text) {
   if (minGrowth === null) minGrowth = 20;
   if (maxVol === null) maxVol = 50;
 
-  const results = DATA.companies
+  let results = DATA.companies
     .filter(c => c.revenue_cagr > minGrowth && c.annualized_volatility < maxVol)
     .sort((a, b) => b.revenue_cagr - a.revenue_cagr);
+  if (countryFilter && countryFilter.length) {
+    results = results.filter(c => countryFilter.includes(c.country_code));
+  }
 
   let html = `Critère appliqué : croissance annuelle &gt; ${minGrowth}% ET volatilité &lt; ${maxVol}%.<br>`;
-  html += `<strong>${results.length} entreprise(s)</strong> qualifient :`;
+  html += `<strong>${results.length} ${entreprises(results.length)}</strong> ${results.length <= 1 ? "qualifie" : "qualifient"} :`;
   html += `<table><thead><tr><th>Entreprise</th><th>Marché</th><th>Croissance</th><th>Risque</th></tr></thead><tbody>`;
   for (const r of results.slice(0, 10)) {
     html += `<tr><td>${r.name}</td><td>${r.name_fr}</td><td>${r.revenue_cagr}%</td><td>${r.annualized_volatility}%</td></tr>`;
@@ -942,7 +548,7 @@ function handleGrowthQuery(text) {
   const byCountry = {};
   results.forEach(r => byCountry[r.name_fr] = (byCountry[r.name_fr] || 0) + 1);
   const dominant = Object.entries(byCountry).sort((a, b) => b[1] - a[1])[0];
-  if (dominant) html += `<br>Marché le plus représenté : <strong>${dominant[0]}</strong> (${dominant[1]} entreprise(s)).`;
+  if (dominant) html += `<br>Marché le plus représenté : <strong>${dominant[0]}</strong> (${dominant[1]} ${entreprises(dominant[1])}).`;
   addMessage('agent', html);
 }
 
@@ -951,39 +557,62 @@ function handleExternalInvestigation(code) {
   if (html) {
     addMessage('agent', html);
   } else {
-    addMessage('agent', "Je n'ai pas encore d'investigation externe préparée pour ce marché — actuellement disponible pour l'Inde et le Royaume-Uni (voir suggestions ci-dessous).");
+    const row = scoreRow(code);
+    addMessage('agent',
+      `Je n'ai pas d'investigation externe préparée pour ${row ? row.name_fr : "ce marché"} — actuellement disponible pour l'Inde et le Royaume-Uni. ` +
+      `Je peux quand même te donner le signal interne :<br><br>` + briefCardHTML(code));
   }
 }
 
 function helpMessage() {
   addMessage('agent',
-    "Je peux répondre à ce type de questions :<br>" +
-    "• « quels marchés prioriser » — vue d'ensemble des 4 catégories<br>" +
-    "• « analyse / recommande pour [pays] » — note complète sur un marché<br>" +
+    "Je n'ai pas de réponse toute faite pour cette formulation précise, mais voici ce que je sais faire avec les données du cas (essaie de reformuler, ou pose une question sur un pays / une entreprise directement) :<br>" +
+    "• « quels marchés prioriser » ou « quel est le meilleur / le plus risqué »<br>" +
+    "• « analyse / que penses-tu de [pays] » — note complète<br>" +
     "• « compare [pays A] et [pays B] »<br>" +
-    "• « entreprises avec forte croissance et risque maîtrisé » (avec ou sans seuils précis, ex. 25% / 40%)<br>" +
-    "• « contexte externe / investigation [pays] » — challenge le signal avec l'actualité réglementaire, économique et concurrentielle récente (Inde, Royaume-Uni)"
+    "• « comment va [entreprise] » (ex. Zomato, Auto Trader, Shopify...)<br>" +
+    "• « entreprises avec forte croissance et risque maîtrisé » (avec ou sans seuils, ex. 25% / 40%)<br>" +
+    "• « contexte externe [pays] » — confronte le signal à l'actualité (Inde, Royaume-Uni)"
   );
 }
 
 function respond(text) {
   const t = stripAccents(text);
   const countries = findCountries(text);
+  const companies = findCompanies(text);
 
-  if (/contexte externe|investigat|veille|challenge/.test(t) && countries.length >= 1) {
+  const isGreeting = /^(salut|bonjour|bonsoir|hello|hey|coucou|ca va|comment vas tu)\b/.test(t.trim());
+  const isThanks = /merci|thanks|super|top|nickel|parfait/.test(t) && t.length < 40;
+
+  if (isGreeting) {
+    addMessage('agent', "Salut ! Pose-moi une question sur les 13 marchés de Shop-EY ou sur une des 43 entreprises suivies — analyse pays, comparaison, filtrage par critères, ou contexte externe (Inde / Royaume-Uni).");
+    return;
+  }
+  if (isThanks) {
+    addMessage('agent', "Avec plaisir. Autre chose à creuser ?");
+    return;
+  }
+
+  if (/contexte externe|investigat|veille|challenge|actualite|reglement/.test(t) && countries.length >= 1) {
     handleExternalInvestigation(countries[0]);
-  } else if (/prioris|ou investir|quels marches/.test(t)) {
+  } else if (/meilleur|top march|plus attractif|plus risqu|eviter|pire march|moins attractif|ne pas investir/.test(t) && countries.length === 0) {
+    handleBest(text);
+  } else if (/prioris|ou investir|quels march|comment se repartissent|classement|repartition/.test(t)) {
     handlePrioritize();
-  } else if (/compar/.test(t) && countries.length >= 2) {
+  } else if (/compar|versus|\bvs\b|face a face/.test(t) && countries.length >= 2) {
     handleCompare(countries);
-  } else if (/(recommand|analys|que penses|avis sur)/.test(t) && countries.length >= 1) {
+  } else if (companies.length >= 1 && countries.length === 0) {
+    handleCompanies(companies);
+  } else if (/(recommand|analys|que pense|avis sur|resum|explique|dis[- ]moi|parle[- ]moi|info sur|detail|pourquoi)/.test(t) && countries.length >= 1) {
     handleSingleCountry(countries[0]);
-  } else if (/croissance|risque|volatilit|grandiss/.test(t)) {
-    handleGrowthQuery(text);
+  } else if (/croissance|risque|volatilit|grandiss|opportunit|screening|quelles entreprises|meilleures entreprises/.test(t)) {
+    handleGrowthQuery(text, countries);
   } else if (countries.length === 1) {
     handleSingleCountry(countries[0]);
   } else if (countries.length >= 2) {
     handleCompare(countries);
+  } else if (companies.length >= 1) {
+    handleCompanies(companies);
   } else {
     helpMessage();
   }
@@ -1007,7 +636,7 @@ document.querySelectorAll('.chip').forEach(chip => {
   });
 });
 
-addMessage('agent', "Bonjour, je suis le Market Radar Agent. Pose-moi une question sur les 13 marchés de Shop-EY, ou choisis une suggestion ci-dessous.");
+addMessage('agent', "Bonjour, je suis MarketLens, l'agent de veille décisionnelle de Shop-EY. Pose-moi une question sur les 13 marchés, sur une entreprise suivie, ou choisis une suggestion ci-dessous.");
 </script>
 </body>
 </html>
