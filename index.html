@@ -196,9 +196,9 @@
 
     <div class="chips">
       <div class="chip" data-q="Quels marchés dois-je prioriser ?">Quels marchés prioriser ?</div>
-      <div class="chip" data-q="Compare l'Inde et le Royaume-Uni">Compare l'Inde et le Royaume-Uni</div>
+      <div class="chip" data-q="Compare l'Indonésie et le Royaume-Uni">Compare l'Indonésie et le Royaume-Uni</div>
       <div class="chip" data-q="Quelles entreprises grandissent vite sans trop de risque ?">Croissance forte, risque maîtrisé</div>
-      <div class="chip" data-q="Contexte externe pour l'Inde">Contexte externe : Inde</div>
+      <div class="chip" data-q="Contexte externe pour l'Indonésie">Contexte externe : Indonésie</div>
       <div class="chip" data-q="Contexte externe pour le Royaume-Uni">Contexte externe : Royaume-Uni</div>
     </div>
 
@@ -216,45 +216,51 @@ const chat = document.getElementById('chat');
 // afin de ne pas dépendre d'une connexion internet le jour de l'entretien). En production,
 // cette étape interrogerait des sources en continu — voir la note en bas de page.
 const EXTERNAL_BRIEFS = {
-  IN: {
-    date: "20/09/2026",
-    score: 31.1,
+  ID: {
+    date: "21/09/2026",
+    score: 31.7,
     orientation_pbi: "Réévaluer avant d'investir",
     pb_signaux: [
-      "Score d'attractivité 2024 : <strong>31,1/100</strong> — le plus bas des 13 marchés avec l'Indonésie",
-      "Pouvoir d'achat 0/100 (PIB/hab. le plus faible) et maturité numérique 0/100 (internet le plus faible)",
-      "Mais meilleur score de taille de marché : 100/100 (1,45 Md d'habitants)",
-      "Sur le terrain : 12 entreprises suivies, croissance moyenne <strong>30,8%/an</strong>, 10/12 au-dessus de la médiane mondiale (11,7%)",
-      "CarTrade, IndiaMART, Info Edge : marges opérationnelles &gt;28%, trésorerie largement au-dessus de la médiane",
+      "Score d'attractivité 2024 : <strong>31,7/100</strong> — le plus bas des 13 marchés avec l'Inde",
+      "Pouvoir d'achat 8,3/100 et maturité numérique 8,3/100 (parmi les plus faibles)",
+      "Mais 2e meilleur score de taille de marché : 75/100 (283 M d'habitants)",
+      "Sur le terrain : <strong>1 seule entreprise suivie</strong> (GoTo Group), croissance <strong>17,3%/an</strong> (au-dessus de la médiane mondiale de 11,7%)",
+      "Mais marge opérationnelle négative (-2,1%), trésorerie négative et baisse historique sévère (-87,6%)",
+      "Projection FMI : croissance PIB attendue en accélération (4,5% → 5,0% en 2026)",
     ],
     contexte_externe: [
-      "23/07/2026 : l'Inde assouplit ses règles d'investissement étranger dans l'e-commerce (Press Note 3, 2026)",
-      "En vigueur depuis le 05/08/2026",
-      "Les acteurs à capital étranger peuvent détenir leur propre inventaire — <strong>uniquement pour exporter</strong> des produits fabriqués en Inde",
+      "21/03/2026 : le gouvernement indonésien resserre l'encadrement des plateformes numériques après la fusion TikTok Shop–Tokopedia",
+      "Ministère des Finances et Ministère du Commerce : application stricte de la retenue d'impôt (PPh 22) sur les marchands des plateformes",
+      "Révision du règlement Permendag 31/2023 pour clarifier la frontière entre réseaux sociaux et commerce transactionnel, priorité donnée aux produits locaux",
+      "Objectif affiché : éviter que le marché domestique ne soit dominé par des plateformes étrangères, dans un contexte de croissance du PIB visée à 5,7% au T1 2026",
+      "Mai 2026 : TikTok Shop capte ~32% du GMV suivi (contre 23% un an plus tôt) — consolidation rapide autour de GoTo/Tokopedia et Shopee",
     ],
     confirmes: [
-      "La sur-performance des acteurs suivis n'est pas un accident statistique",
-      "Cohérente avec un marché encore en phase de rattrapage numérique et de pouvoir d'achat → marge de croissance plus longue",
+      "La faiblesse du score pouvoir d'achat (8,3/100) est cohérente avec un GoTo Group structurellement peu rentable (marge -2,1%, trésorerie négative) malgré une forte croissance",
+      "Le retard de maturité numérique (8,3/100) coexiste avec une consolidation rapide autour de quelques plateformes dominantes — la croissance du digital est concentrée, pas généralisée",
     ],
     nuances: [
-      "Le score (31,1/100) est un <strong>rang relatif</strong>, pas une mesure absolue : un pays peut être dernier en niveau et premier en dynamique (Zomato : +97,7%/an)",
-      "L'assouplissement du 23/07 ne profite qu'au modèle export/sourcing — la vente domestique à capital étranger reste interdite (marketplace obligatoire)",
+      "Le score Power BI ne capte pas le resserrement réglementaire du 21/03/2026, qui vise justement à freiner les acteurs dominants comme GoTo/Tokopedia",
+      "Une croissance de 17,3%/an supérieure à la médiane mondiale masque une rentabilité négative et un drawdown historique de -87,6% : signe d'un marché encore en phase de consolidation coûteuse, pas de maturité",
     ],
     opportunites: [
-      "Modèle « sourcing + export depuis l'Inde » directement renforcé par l'assouplissement réglementaire",
-      "Le retard numérique (score 0/100) est aussi la principale réserve de croissance future pour un acteur déjà implanté",
+      "2e meilleur score de taille de marché des 13 pays (283 M d'habitants) : la base de consommateurs reste immense malgré le retard numérique",
+      "La priorité réglementaire donnée aux produits locaux pourrait favoriser un positionnement appuyé sur des fournisseurs/partenaires indonésiens plutôt qu'un modèle d'importation directe",
     ],
     risques: [
-      "Vente directe aux consommateurs indiens : toujours besoin d'un partenaire local (marketplace)",
-      "Dynamique d'investissement (IDE) faible : 33,3/100",
+      "Resserrement fiscal et réglementaire en cours (retenue PPh 22, révision du Permendag 31/2023) : coûts de conformité accrus pour tout nouvel entrant",
+      "Marché concentré autour de GoTo/Tokopedia (adossé à TikTok) et Shopee : une entrée tardive affronterait des acteurs déjà dominants avec des économies d'échelle en logistique",
     ],
     manquantes: [
-      "Calendrier d'une éventuelle libéralisation future pour la vente domestique",
-      "Réaction des acteurs domestiques (Flipkart, Reliance) à ce changement",
+      "Calendrier précis d'application de la révision du Permendag 31/2023 et impact chiffré sur les marchands tiers",
+      "Détail des conditions imposées par le régulateur de la concurrence à la fusion TikTok Shop–Tokopedia (accès ouvert, seuils de concentration)",
     ],
-    sources: ['<a href="https://www.india-briefing.com/news/india-fdi-inventory-based-e-commerce-exports-rule-change-46324.html/" target="_blank" rel="noopener">India Briefing — India Eases FDI Rules for Inventory-Based E-Commerce Exports</a> (23/07/2026)'],
-    orientation: "investir",
-    orientation_note: "Le score Power BI seul (« Réévaluer avant d'investir ») sous-estime largement la dynamique réelle des acteurs — investir en priorité sur un modèle export/sourcing plutôt que sur la vente directe.",
+    sources: [
+      '<a href="https://magpieiq.com/insights/tiktok-shop-indonesia-2026/" target="_blank" rel="noopener">Magpie IQ — TikTok Shop Indonesia 2026: Market Share, Growth &amp; What’s Next</a> (2026)',
+      '<a href="https://indonesiabusinesspost.com/6353/markets-and-finance/indonesia-moves-to-safeguard-digital-market-amid-rise-of-foreign-platforms-after-tiktok-tokopedia-merger" target="_blank" rel="noopener">Indonesia Business Post — Indonesia moves to safeguard digital market amid rise of foreign platforms</a> (21/03/2026)',
+    ],
+    orientation: "reevaluer",
+    orientation_note: "Le contexte externe renforce la prudence du score Power BI : la taille du marché est réelle, mais la rentabilité négative du seul acteur suivi et le resserrement réglementaire de mars 2026 justifient de réévaluer avant tout renforcement, plutôt que d'investir sur la seule promesse démographique.",
   },
   GB: {
     date: "20/09/2026",
@@ -559,7 +565,7 @@ function handleExternalInvestigation(code) {
   } else {
     const row = scoreRow(code);
     addMessage('agent',
-      `Je n'ai pas d'investigation externe préparée pour ${row ? row.name_fr : "ce marché"} — actuellement disponible pour l'Inde et le Royaume-Uni. ` +
+      `Je n'ai pas d'investigation externe préparée pour ${row ? row.name_fr : "ce marché"} — actuellement disponible pour l'Indonésie et le Royaume-Uni. ` +
       `Je peux quand même te donner le signal interne :<br><br>` + briefCardHTML(code));
   }
 }
@@ -572,7 +578,7 @@ function helpMessage() {
     "• « compare [pays A] et [pays B] »<br>" +
     "• « comment va [entreprise] » (ex. Zomato, Auto Trader, Shopify...)<br>" +
     "• « entreprises avec forte croissance et risque maîtrisé » (avec ou sans seuils, ex. 25% / 40%)<br>" +
-    "• « contexte externe [pays] » — confronte le signal à l'actualité (Inde, Royaume-Uni)"
+    "• « contexte externe [pays] » — confronte le signal à l'actualité (Indonésie, Royaume-Uni)"
   );
 }
 
@@ -585,7 +591,7 @@ function respond(text) {
   const isThanks = /merci|thanks|super|top|nickel|parfait/.test(t) && t.length < 40;
 
   if (isGreeting) {
-    addMessage('agent', "Salut ! Pose-moi une question sur les 13 marchés de Shop-EY ou sur une des 43 entreprises suivies — analyse pays, comparaison, filtrage par critères, ou contexte externe (Inde / Royaume-Uni).");
+    addMessage('agent', "Salut ! Pose-moi une question sur les 13 marchés de Shop-EY ou sur une des 43 entreprises suivies — analyse pays, comparaison, filtrage par critères, ou contexte externe (Indonésie / Royaume-Uni).");
     return;
   }
   if (isThanks) {
